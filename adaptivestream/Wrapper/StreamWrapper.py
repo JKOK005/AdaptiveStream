@@ -1,23 +1,15 @@
 from abc import ABC
+from multiprocessing import Process
 
 class StreamWrapper(ABC):
-	def __init__(self, 	base_model,
-						router,
-						scaling_strategy,
-						compaction_strategy,
+	def __init__(self, 	model_manager,
 						ingestion_source,
 				):
 		"""
-		: param base_model 			: Foundational model for each expert
-		: param router 				: Router class used to decide expert allocation during inference
-		: param scaling_strategy 	: ScalingStrategy class used to scale experts
-		: param compaction_strategy : CompactionStrategy class used to perform compaction
+		: param model_manager 		: ModelManager class
 		: param ingestion_source 	: Source class used to fetch data for training
 		"""
 		self.base_model 			= base_model
-		self.router 				= router
-		self.scaling_strategy  		= scaling_strategy
-		self.compaction_strategy 	= compaction_strategy
 		self.ingestion_source 		= ingestion_source
 		return
 
@@ -35,4 +27,6 @@ class StreamWrapper(ABC):
 		pass
 
 	def start(self):
-		pass
+		stream_handler = Process(target = self._run)
+		stream_handler.start()
+		return stream_handler

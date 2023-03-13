@@ -1,0 +1,2 @@
+class RouterBase(object):
+	pass
