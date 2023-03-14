@@ -5,11 +5,11 @@ class Router(ABC):
 		pass 
 
 	@abstractmethod
-	def train(self, input_X, *args, **kwargs):
+	def train(self, *args, **kwargs):
 		pass
 
 	@abstractmethod
-	def is_within_distribution(self, input_X):
+	def is_within_distribution(self, *args, **kwargs):
 		"""
 		Evaluates if the input data is within the distribution of data router has been conditioned over
 		"""

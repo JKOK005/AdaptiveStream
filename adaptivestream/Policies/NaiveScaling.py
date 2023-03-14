@@ -1,13 +1,14 @@
 import copy
+from Policies.ScalingPolicy import ScalingPolicy
 from Models.Expert import Expert
 from Wrapper.ModelWrapper import ModelWrapper
 from Routers.Router import Router
 
-class SingleScalingPolicy(object):
+class NaiveScaling(ScalingPolicy):
 	def __init__(self, 	model: ModelWrapper, 
-						router: Router):
-		self.model_template 	= model 
-		self.router_template 	= router
+						router: Router
+				):
+		super(NaiveScaling).__init__(model = model, router = router)
 		return
 
 	def train_expert(self, input_X, output_Y = None):

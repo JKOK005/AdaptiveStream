@@ -32,13 +32,19 @@ class ExpertEnsemble(object):
 		self.buffer.add(batch_input)
 		
 		if self.buffer.start_expert_training():
-			expert = self._train(batch_input = self.buffer.get_buffer())
+			buffer_data = self.buffer.get_buffer()
+			expert = self._train(batch_input = buffer_data)
 			self.experts.append(expert)
 
-			if self.compaction_policy.start_compacting(self.experts):
-				(new_fallback_expert, new_experts) = self.compaction_policy.compact(self.experts, fallback_expert)
+			if self.compaction_policy.trigger_compaction(self.experts):
+				(new_fallback_expert, new_experts) = self.compaction_policy.compact(
+														expert_chain = self.experts, 
+														prev_fallback_expert = self.fallback_expert, 
+														input_data = buffer_data
+													)
+
 				self.fallback_expert = new_fallback_expert
 				self.experts = new_experts
 		
-		self.buffer.clear()
+			self.buffer.clear()
 		return
