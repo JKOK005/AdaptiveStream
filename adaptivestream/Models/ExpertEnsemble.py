@@ -19,20 +19,21 @@ class ExpertEnsemble(object):
 		return
 
 	def _train(self, batch_input):
-		(router, expert) = self.scaling_policy.train_on_input(batch_input)
-		return (router, expert)
+		expert = self.scaling_policy.train_expert(batch_input)
+		return expert
 
 	def infer(self, input_data):
 		for each_expert in self.experts.reverse():
-			if each_expert.permit_entry(input_data):
+			if each_expert.bypass(input_data):
 				return each_expert.infer(input_data)
 		return self.fallback_expert.infer(input_data)
 
 	def ingest(self, batch_input):
 		self.buffer.add(batch_input)
 		
-		if self.buffer.exceed_capacity():
-			(router, expert) = self.train(batch_input = self.buffer.get_buffer())
+		if self.buffer.start_expert_training():
+			expert = self._train(batch_input = self.buffer.get_buffer())
+			self.experts.append(expert)
 
 			if self.compaction_policy.start_compacting(self.experts):
 				(new_fallback_expert, new_experts) = self.compaction_policy.compact(self.experts, fallback_expert)

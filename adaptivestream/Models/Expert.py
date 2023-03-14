@@ -1,11 +1,12 @@
 from Wrapper.ModelWrapper import ModelWrapper
+from Routers.Router import Router
 
 class Expert(object):
 	self.trained_model 	= trained_model
 	self.router 		= router
 
 	def __init__(self, 	trained_model: ModelWrapper, 
-						router
+						router: Router
 				):
 		pass
 
