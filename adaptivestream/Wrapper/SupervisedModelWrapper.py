@@ -1,4 +1,5 @@
 from abc import ABC
+from abc import abstractmethod
 from Wrapper.ModelWrapper import ModelWrapper
 
 class SupervisedModelWrapper(ModelWrapper, ABC):

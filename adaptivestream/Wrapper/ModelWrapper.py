@@ -1,4 +1,5 @@
 from abc import ABC
+from abc import abstractmethod
 
 class ModelWrapper(ABC):
 	def __init__(self, base_model, *args, **kwargs):

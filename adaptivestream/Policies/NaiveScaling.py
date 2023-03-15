@@ -6,7 +6,8 @@ from Routers.Router import Router
 
 class NaiveScaling(ScalingPolicy):
 	def __init__(self, 	model: ModelWrapper, 
-						router: Router
+						router: Router,
+						*args, **kwargs
 				):
 		super(NaiveScaling).__init__(model = model, router = router)
 		return

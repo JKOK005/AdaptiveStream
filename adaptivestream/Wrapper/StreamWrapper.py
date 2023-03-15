@@ -1,9 +1,11 @@
 from abc import ABC
+from abc import abstractmethod
 from multiprocessing import Process
 
 class StreamWrapper(ABC):
 	def __init__(self, 	ensemble,
 						ingestion_source,
+						*args, **kwargs
 				):
 		"""
 		: param ensemble 			: ExpertEnsemble class

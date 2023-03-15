@@ -1,14 +1,16 @@
 from abc import ABC
+from abc import abstractmethod
 from Wrapper.ModelWrapper import ModelWrapper
-from Routers.Router import Router
+from Models.Router import Router
 
 class ScalingPolicy(ABC):
-	self.model_template 	= None
-	self.router_template 	= None
-	self.buffer 			= None
+	model_template 	= None
+	router_template = None
+	buffer 			= None
 
 	def __init__(self, 	model: ModelWrapper, 
-						router: Router
+						router: Router,
+						*args, **kwargs
 				):
 		self.model_template 	= model 
 		self.router_template 	= router
@@ -19,6 +21,5 @@ class ScalingPolicy(ABC):
 		return
 
 	@abstractmethod
-	def train_expert(self,  input_X, output_Y = None, 
-							*args, **kwargs):
+	def train_expert(self, *args, **kwargs):
 		pass

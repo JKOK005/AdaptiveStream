@@ -1,21 +1,16 @@
 from abc import ABC
+from abc import abstractmethod
 
 class CompactionPolicy(ABC):
-	self.buffer 	= None
+	buffer 	= None
 
 	def set_buffer(self, buffer):
 		self.buffer = buffer
 		return
 
 	@abstractmethod
-	def trigger_compaction(self, expert_chain, 
-								 *args, **kwargs
-						 ):
-		pass
-
-	@abstractmethod
-	def compact(self, expert_chain, 
-					  prev_fallback_expert,
+	def compact(self, experts, 
+					  fallback_expert,
 					  *args, **kwargs
 				):
 		pass
