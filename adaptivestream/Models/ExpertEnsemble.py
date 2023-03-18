@@ -27,11 +27,22 @@ class ExpertEnsemble(object):
 		return
 
 	def _check_to_scale(self):
-		decisions 	= [each_rule.check_scaling(buffer = self.buffer) for each_rule in self.scaling_rules]
-		return any(decisions)
+		def check(rule):
+			if type(rule) == tuple:
+				return all([check(rule = each_rule) for each_rule in rule])
+			else:
+				return rule.check_scaling(buffer = self.buffer)
+
+		return any([check(rule = each_rule) for each_rule in self.scaling_rules])
 
 	def _check_to_compact(self):
-		decisions 	= [each_rule.check_compact(experts = self.experts) for each_rule in self.compaction_rules]
+		def check(rule):
+			if type(rule) == tuple:
+				return all([check(rule = each_rule) for each_rule in rule])
+			else:
+				return rule.check_compact(experts = self.experts)
+
+		decisions 	= [check(rule = each_rule) for each_rule in self.compaction_rules]
 		return any(decisions)
 
 	def ingest(self, batch_input):

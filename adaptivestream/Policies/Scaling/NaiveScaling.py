@@ -1,8 +1,8 @@
 import copy
-from Policies.ScalingPolicy import ScalingPolicy
 from Models.Expert import Expert
+from Models.Router import Router
+from Policies.Scaling.ScalingPolicy import ScalingPolicy
 from Wrapper.ModelWrapper import ModelWrapper
-from Routers.Router import Router
 
 class NaiveScaling(ScalingPolicy):
 	def __init__(self, 	model: ModelWrapper, 
