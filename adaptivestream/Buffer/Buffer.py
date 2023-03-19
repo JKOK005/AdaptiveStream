@@ -14,6 +14,10 @@ class Buffer(ABC):
 		pass
 
 	@abstractmethod
+	def get_count(self, *args, **kwargs):
+		pass
+
+	@abstractmethod
 	def get_last_cleared(self, *args, **kwargs) -> datetime:
 		"""
 		Returns when the buffer was last cleared
