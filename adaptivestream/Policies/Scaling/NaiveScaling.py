@@ -12,12 +12,12 @@ class NaiveScaling(ScalingPolicy):
 		super(NaiveScaling).__init__(model = model, router = router)
 		return
 
-	def train_expert(self, input_X, output_Y = None):
+	def train_expert(self):
 		expert_model 	= copy.deepcopy(self.model_template)
-		expert_model.train(input_X = input_X, output_Y = output_Y)
+		expert_model.train(buffer = self.buffer)
 
 		expert_router 	= copy.deepcopy(self.router_template)
-		expert_router.train(input_X = input_X)
+		expert_router.train(buffer = self.buffer)
 
 		trained_expert 	= Expert(trained_model = expert_model, router = expert_router)
 		return trained_expert

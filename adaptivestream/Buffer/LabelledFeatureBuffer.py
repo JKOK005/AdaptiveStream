@@ -1,8 +1,8 @@
-from Buffer.Buffer import Buffer
 import datetime
 import torch
+from Buffer.LabelledBuffer import LabelledBuffer
 
-class LabelledFeatureBuffer(Buffer):
+class LabelledFeatureBuffer(LabelledBuffer):
 	feat 			= None
 	label 			= None
 	count   		= 0
@@ -20,10 +20,12 @@ class LabelledFeatureBuffer(Buffer):
 	def get_last_cleared(self):
 		return self.last_cleared
 
-	def add(self, 	batch_input: [torch.Tensor], 
+	def add(self, 	batch_input: (torch.Tensor), 
 					*args, **kwargs
 			):
-		
+		"""
+		Input data is expected to be a tuple of (feat, labels)
+		"""
 		input_feat 	= batch_input[0]
 		input_label = batch_input[1]
 
