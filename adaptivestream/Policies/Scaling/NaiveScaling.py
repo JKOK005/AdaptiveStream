@@ -9,7 +9,7 @@ class NaiveScaling(ScalingPolicy):
 						router: Router,
 						*args, **kwargs
 				):
-		super(NaiveScaling).__init__(model = model, router = router)
+		super(NaiveScaling, self).__init__(model = model, router = router)
 		return
 
 	def train_expert(self):

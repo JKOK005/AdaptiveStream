@@ -4,7 +4,7 @@ from Buffer.Buffer import Buffer
 
 class LabelledBuffer(Buffer):
 	def __init__(self, *args, **kwargs):
-		super(LabelledBuffer).__init__(*args, **kwargs)
+		super(LabelledBuffer, self).__init__(*args, **kwargs)
 		return
 
 	@abstractmethod

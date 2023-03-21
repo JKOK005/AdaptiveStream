@@ -8,6 +8,10 @@ class LabelledFeatureBuffer(LabelledBuffer):
 	count   		= 0
 	last_cleared 	= 0
 
+	def __init__(self, *args, **kwargs):
+		super(LabelledFeatureBuffer, self).__init__(*args, **kwargs)
+		return
+
 	def get_data(self):
 		return self.feat
 
@@ -47,3 +51,4 @@ class LabelledFeatureBuffer(LabelledBuffer):
 		self.label 			= None
 		self.count 			= 0
 		self.last_cleared 	= datetime.datetime.now()
+		return

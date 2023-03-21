@@ -1,16 +1,19 @@
 import torch
+import logging
 from Buffer.Buffer import Buffer
 from Wrapper.ModelWrapper import ModelWrapper
 
-class SupervisedModelWrapper(ModelWrapper, torch.nn.Module):
+class SupervisedModelWrapper(torch.nn.Module, ModelWrapper):
 	def __init__(self, 	base_model: torch.nn, 
 						optimizer: torch.optim, 
 						loss: torch.nn.modules.loss,
 						*args, **kwargs
 				):
+		super(SupervisedModelWrapper, self).__init__()
+		self.base_model = base_model
 		self.optimizer 	= optimizer
 		self.loss 		= loss
-		super(SupervisedModelWrapper).__init__(base_model = base_model, *args, **kwargs)
+		self.logger  	= logging.getLogger("SupervisedModelWrapper")
 		return
 
 	def train(self, buffer: Buffer, 
@@ -26,15 +29,24 @@ class SupervisedModelWrapper(ModelWrapper, torch.nn.Module):
 		batched_label   = torch.tensor_split(buffer_label, buffer_label.shape[0] // batch_size, dim = 0)
 
 		for each_epoch in range(epoch):
-			for indx in range(len(batched_feat)):
-				self.optimizer.zero_grad()
+			batch_cost 	= []
 
+			for indx in range(len(batched_feat)):
 				input_feat 	= batched_feat[indx]
 				input_label = batched_label[indx]
-				
-				output 		= self.base_model(input_feat)
-				loss 		= self.loss(output, input_label)
 
-				self.loss.backward()
+				output 		= self.base_model(input_feat)
+				cost 		= self.loss(output, input_label)
+				batch_cost.append(cost)
+
+				self.optimizer.zero_grad()
+				cost.backward()
 				self.optimizer.step()
+
+			batch_cost_mean = torch.mean(torch.stack(batch_cost))
+			batch_cost_mean_formatted = "{0:.4f}".format(batch_cost_mean)
+			self.logger.info(f"Batch mean {batch_cost_mean_formatted}, Epoch {each_epoch}")
 		return
+
+	def infer(self, input_X, *args, **kwargs):
+		pass
