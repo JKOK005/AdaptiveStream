@@ -13,8 +13,10 @@ class Router(ABC):
 		pass
 
 	@abstractmethod
-	def is_within_distribution(self, *args, **kwargs):
+	def permit_entry(self, *args, **kwargs):
 		"""
-		Evaluates if the input data is within the distribution of data router has been conditioned over
+		Evaluates if the input data is within the distribution of data router has been conditioned over.
+
+		If true, permit entry to the expert.
 		"""
 		pass
