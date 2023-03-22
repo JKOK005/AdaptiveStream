@@ -46,7 +46,7 @@ class ExpertEnsemble(object):
 		return any(decisions)
 
 	def ingest(self, batch_input):
-		self.buffer.add(batch_input)
+		self.buffer.add(batch_input = batch_input)
 			
 		if self._check_to_compact():
 			(new_fallback_expert, new_experts) 	= self.compaction_policy.compact(

@@ -11,5 +11,5 @@ class MaxBufferSize(ScalingRules):
 
 		params: max_size : maximum size of buffer before call to scale
 		"""
-		data = buffer.get_data()
-		return len(data) >= self.max_size
+		count = buffer.get_counts()
+		return count >= self.max_size
