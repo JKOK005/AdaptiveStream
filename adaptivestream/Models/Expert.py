@@ -1,5 +1,5 @@
-from Wrapper.ModelWrapper import ModelWrapper
-from Models.Router import Router
+from Models.Router.Router import Router
+from Models.Wrapper.ModelWrapper import ModelWrapper
 
 class Expert(object):
 	trained_model 	= None

@@ -1,7 +1,7 @@
 import logging
 import tensorflow as tf
 from Buffer.LabelledFeatureBuffer import LabelledFeatureBuffer
-from Models.OneClassSVMRouter import OneClassSVMRouter
+from Models.Router.OneClassSVMRouter import OneClassSVMRouter
 from sklearn.datasets import load_diabetes
 
 """

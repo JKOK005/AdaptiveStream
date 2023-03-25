@@ -1,7 +1,7 @@
 from abc import ABC
 from abc import abstractmethod
-from Wrapper.ModelWrapper import ModelWrapper
-from Models.Router import Router
+from Models.Wrapper.ModelWrapper import ModelWrapper
+from Models.Router.Router import Router
 
 class ScalingPolicy(ABC):
 	model_template 	= None

@@ -1,7 +1,7 @@
 import tensorflow as tf
 import logging
 from Buffer.Buffer import Buffer
-from Wrapper.ModelWrapper import ModelWrapper
+from Models.Wrapper.ModelWrapper import ModelWrapper
 
 class SupervisedModelWrapper(ModelWrapper):
 	def __init__(self, 	base_model: tf.keras.Model, 
@@ -25,7 +25,7 @@ class SupervisedModelWrapper(ModelWrapper):
 		buffer_feat 	= buffer.get_data()
 		buffer_label 	= buffer.get_label()
 
-		self.model.compile(optimizer = optimizer, loss = loss)
+		self.model.compile(optimizer = self.optimizer, loss = self.loss)
 		self.model.fit(	buffer_feat, buffer_label, 
 						epochs = epoch, batch_size = batch_size, verbose = 1)
 		return

@@ -1,6 +1,6 @@
-from Buffer.Buffer import Buffer
 from abc import ABC
 from abc import abstractmethod
+from Buffer.Buffer import Buffer
 
 class ModelWrapper(ABC):
 	def __init__(self, *args, **kwargs):

@@ -1,15 +1,17 @@
 from Buffer.Buffer import Buffer
 from sklearn import svm
-from Models.Router import Router
+from Models.Router.Router import Router
 
 class OneClassSVMRouter(Router):
-	def __init__(self, *args, **kwargs):
+	def __init__(self, 	init_params: dict, 
+						*args, **kwargs
+		):
 		"""
 		Parameters follow suite svm.OneClassSVM class in Scikit
 
 		Ref: https://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html#sklearn.svm.OneClassSVM
 		"""
-		self.classifier = svm.OneClassSVM(**kwargs)
+		self.classifier = svm.OneClassSVM(**init_params)
 		return
 
 	def train(self, buffer: Buffer,

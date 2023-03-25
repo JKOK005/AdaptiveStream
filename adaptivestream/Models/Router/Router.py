@@ -3,9 +3,6 @@ from abc import abstractmethod
 from Buffer.Buffer import Buffer
 
 class Router(ABC):
-	def __init__(self, base_model):
-		pass 
-
 	@abstractmethod
 	def train(self, buffer: Buffer, 
 					*args, **kwargs

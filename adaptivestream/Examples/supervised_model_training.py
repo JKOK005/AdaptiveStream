@@ -1,7 +1,7 @@
 import logging
 import tensorflow as tf
 from Buffer.LabelledFeatureBuffer import LabelledFeatureBuffer
-from Wrapper.SupervisedModelWrapper import SupervisedModelWrapper
+from Models.Wrapper.SupervisedModelWrapper import SupervisedModelWrapper
 from sklearn.datasets import load_diabetes
 from tensorflow.keras import layers, losses, optimizers, Sequential
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
 	base_model 	= build_net(feats_as_tensor.shape[1], 1)
 	criterion	= losses.MeanSquaredError()
-	optimizer 	= optimizers.SGD(learning_rate = 0.001)
+	optimizer 	= optimizers.SGD(learning_rate = 0.0001)
 
 	model_wrapper = SupervisedModelWrapper(
 						base_model 	= base_model,
