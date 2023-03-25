@@ -1,6 +1,5 @@
-import torch
-import torch.nn as nn
 import logging
+import tensorflow as tf
 from Buffer.LabelledFeatureBuffer import LabelledFeatureBuffer
 from Models.OneClassSVMRouter import OneClassSVMRouter
 from sklearn.datasets import load_diabetes
@@ -19,8 +18,9 @@ if __name__ == "__main__":
 	labels  = data["target"]
 
 	# Ensure proper formatting of all input / output tensors
-	feats_as_tensor 	= torch.tensor(feats.values).type(torch.float32)
-	labels_as_tensor 	= torch.tensor(labels.values).reshape(-1,1).type(torch.float32)
+	feats_as_tensor 	= tf.convert_to_tensor(feats.values, dtype = tf.float32)
+	labels_as_tensor	= tf.convert_to_tensor(labels.values, dtype = tf.float32)
+	labels_as_tensor 	= tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
 
 	# Initialize and load data into the buffer
 	buffer 	= LabelledFeatureBuffer()
