@@ -18,7 +18,7 @@ class Expert(object):
 		Bypass checks if input data is within the data distribution router is trained over. 
 		If True, we allow this expert to perform inference over the data.
 		"""
-		return self.router.is_within_distribution(input_data)
+		return self.router.permit_entry(input_data)
 
 	def infer(self, input_X, *args, **kwargs):
 		return self.trained_model.infer(input_X = input_X)

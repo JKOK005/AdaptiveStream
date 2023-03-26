@@ -46,13 +46,13 @@ if __name__ == "__main__":
 	optimizer 	= optimizers.SGD(learning_rate = 0.0001)
 
 	model_wrapper = SupervisedModelWrapper(
-						base_model 	= base_model,
-						optimizer 	= optimizer,
-						loss 		= criterion
+						base_model 		= base_model,
+						optimizer 		= optimizer,
+						loss 			= criterion,
+						training_params = {
+							"epochs" 		: 1500,
+							"batch_size" 	: 64
+						}
 					)
 
-	model_wrapper.train(
-		buffer 		= buffer,
-		epoch  		= 1500,
-		batch_size 	= 64, 
-	)
+	model_wrapper.train(buffer = buffer)
