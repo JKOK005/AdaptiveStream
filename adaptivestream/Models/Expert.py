@@ -1,5 +1,5 @@
-from Wrapper.ModelWrapper import ModelWrapper
-from Models.Router import Router
+from Models.Router.Router import Router
+from Models.Wrapper.ModelWrapper import ModelWrapper
 
 class Expert(object):
 	trained_model 	= None
@@ -13,12 +13,12 @@ class Expert(object):
 		self.router 		= router
 		return
 
-	def bypass(self, input_X, *args, **kwargs):
+	def permit_entry(self, input_X, *args, **kwargs):
 		"""
-		Bypass checks if input data is within the data distribution router is trained over. 
+		permit_entry checks if input data is within the data distribution router is trained over. 
 		If True, we allow this expert to perform inference over the data.
 		"""
-		return self.router.is_within_distribution(input_data)
+		return self.router.permit_entry(input_X = input_X)
 
 	def infer(self, input_X, *args, **kwargs):
 		return self.trained_model.infer(input_X = input_X)

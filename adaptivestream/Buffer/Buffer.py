@@ -1,3 +1,4 @@
+import tensorflow as tf
 from abc import ABC
 from abc import abstractmethod
 from datetime import datetime
@@ -7,14 +8,14 @@ class Buffer(ABC):
 		pass
 
 	@abstractmethod
-	def get_data(self, *args, **kwargs):
+	def get_data(self, *args, **kwargs) -> tf.Tensor:
 		"""
 		Returns stored data in the buffer
 		"""
 		pass
 
 	@abstractmethod
-	def get_count(self, *args, **kwargs):
+	def get_count(self, *args, **kwargs) -> int:
 		pass
 
 	@abstractmethod

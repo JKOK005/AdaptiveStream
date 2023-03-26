@@ -1,5 +1,5 @@
 import datetime
-import torch
+import tensorflow as tf
 from Buffer.LabelledBuffer import LabelledBuffer
 
 class LabelledFeatureBuffer(LabelledBuffer):
@@ -12,19 +12,19 @@ class LabelledFeatureBuffer(LabelledBuffer):
 		super(LabelledFeatureBuffer, self).__init__(*args, **kwargs)
 		return
 
-	def get_data(self):
+	def get_data(self) -> tf.Tensor:
 		return self.feat
 
-	def get_label(self):
+	def get_label(self) -> tf.Tensor:
 		return self.label
 
-	def get_count(self):
+	def get_count(self) -> int:
 		return self.count
 
-	def get_last_cleared(self):
+	def get_last_cleared(self) -> datetime.datetime:
 		return self.last_cleared
 
-	def add(self, 	batch_input: (torch.Tensor), 
+	def add(self, 	batch_input: (tf.Tensor), 
 					*args, **kwargs
 			):
 		"""
@@ -34,12 +34,12 @@ class LabelledFeatureBuffer(LabelledBuffer):
 		input_label = batch_input[1]
 
 		if self.feat is not None:
-			self.feat = torch.vstack(self.feat, input_feat)
+			self.feat = tf.concat([self.feat, input_feat], axis = 0)
 		else:
 			self.feat = input_feat
 
 		if self.label is not None:
-			self.label = torch.vstack(self.label, input_label)
+			self.label = tf.concat([self.label, input_label], axis = 0)
 		else:
 			self.label = input_label
 

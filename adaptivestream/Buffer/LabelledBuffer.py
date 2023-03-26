@@ -1,3 +1,4 @@
+import tensorflow as tf
 from abc import ABC
 from abc import abstractmethod
 from Buffer.Buffer import Buffer
@@ -8,7 +9,7 @@ class LabelledBuffer(Buffer):
 		return
 
 	@abstractmethod
-	def get_label(self, *args, **kwargs):
+	def get_label(self, *args, **kwargs) -> tf.Tensor:
 		"""
 		Returns labels for each data in buffer
 		"""
