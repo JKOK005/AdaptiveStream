@@ -45,7 +45,7 @@ def build_router(input_size):
 				},
 
 				training_params = {
-					"loss_fn" 			: elbo,
+					"loss_fn" 		: elbo,
 					"optimizer" 	: optimizers.Adam(learning_rate=1e-3),
 				},
 
@@ -82,8 +82,8 @@ if __name__ == "__main__":
 	labels  = data["target"]
 
 	# Ensure proper formatting of all input / output tensors
-	feats_as_tensor 	= tf.convert_to_tensor(feats.values, dtype = tf.float32)
-	labels_as_tensor	= tf.convert_to_tensor(labels.values, dtype = tf.float32)
+	feats_as_tensor 	= tf.convert_to_tensor(feats.values, dtype = tf.float32)[:-2]
+	labels_as_tensor	= tf.convert_to_tensor(labels.values, dtype = tf.float32)[:-2]
 	labels_as_tensor 	= tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
 
 	# Initialize and load data into the buffer
@@ -93,6 +93,14 @@ if __name__ == "__main__":
 	model_wrapper 	= build_model_wrapper(input_size = feats_as_tensor.shape[1], output_size = 1)
 	router 			= build_router(input_size = feats_as_tensor.shape[1])
 
+	# Train a single expert using naive scaling
 	policy  		= NaiveScaling(model = model_wrapper, router = router)
 	policy.set_buffer(buffer = buffer)
 	new_expert 		= policy.train_expert()
+
+	# Perform outlier detection
+	test_data  		= feats_as_tensor[-1, None]
+	rand_data 		= tf.random.uniform([1, feats_as_tensor.shape[1]])
+	
+	print(f"Test data passes router selection: {new_expert.permit_entry(input_X = test_data)}")
+	print(f"Random data passes router selection: {new_expert.permit_entry(input_X = rand_data)}")

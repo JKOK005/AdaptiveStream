@@ -10,7 +10,7 @@ class Router(ABC):
 		pass
 
 	@abstractmethod
-	def permit_entry(self, *args, **kwargs):
+	def permit_entry(self, *args, **kwargs) -> bool:
 		"""
 		Evaluates if the input data is within the distribution of data router has been conditioned over.
 

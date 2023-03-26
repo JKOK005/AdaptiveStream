@@ -29,6 +29,7 @@ class OutlierVAERouter(Router):
 
 	def permit_entry(self, 	input_X, 
 					  		*args, **kwargs
-	  		):
+	  		) -> bool:
 		self.inference_params["outlier_type"] = "instance"
-		return self.classifier.predict(input_X, **self.inference_params)
+		pred 	= self.classifier.predict(input_X, **self.inference_params)
+		return pred["data"]["is_outlier"][0] == 0
