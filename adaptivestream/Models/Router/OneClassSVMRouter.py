@@ -1,3 +1,4 @@
+import tensorflow as tf
 from Buffer.Buffer import Buffer
 from sklearn import svm
 from Models.Router.Router import Router
@@ -21,9 +22,9 @@ class OneClassSVMRouter(Router):
 		self.classifier.fit(feat)
 		return
 
-	def permit_entry(self, 	input_X, 
+	def permit_entry(self, 	input_X: tf.Tensor, 
 					  		*args, **kwargs
-			 		):
+			 		) -> bool:
 		"""
 		If class is 1 for input data, we permit entry.
 		"""

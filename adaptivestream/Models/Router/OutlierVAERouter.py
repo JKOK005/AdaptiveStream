@@ -27,9 +27,13 @@ class OutlierVAERouter(Router):
 		self.classifier.fit(feat, **self.training_params)
 		return
 
-	def permit_entry(self, 	input_X, 
+	def permit_entry(self, 	input_X: tf.Tensor, 
 					  		*args, **kwargs
-	  		) -> bool:
+	  				) -> bool:
+		"""
+		Performs outlier detection on a single input_x target.
+		If is_outlier result is 0, the data is accepted and passes through the gate.
+		"""
 		self.inference_params["outlier_type"] = "instance"
 		pred 	= self.classifier.predict(input_X, **self.inference_params)
 		return pred["data"]["is_outlier"][0] == 0
