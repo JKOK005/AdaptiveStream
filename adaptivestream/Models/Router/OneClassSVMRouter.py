@@ -8,9 +8,9 @@ class OneClassSVMRouter(Router):
 						*args, **kwargs
 		):
 		"""
-		Parameters follow suite svm.OneClassSVM class in Scikit
+		Parameters follow suite svm.OneClassSVM class in Scikit [1]
 
-		Ref: https://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html#sklearn.svm.OneClassSVM
+		[1]: https://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html#sklearn.svm.OneClassSVM
 		"""
 		self.classifier = svm.OneClassSVM(**init_params)
 		return
