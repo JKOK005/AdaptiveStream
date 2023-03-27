@@ -4,7 +4,9 @@ from Buffer.LabelledBuffer import LabelledBuffer
 
 class LabelledFeatureBuffer(LabelledBuffer):
 	feat 			= None
+	feat_latest 	= None
 	label 			= None
+	label_latest 	= None
 	count   		= 0
 	last_cleared 	= 0
 
@@ -15,8 +17,14 @@ class LabelledFeatureBuffer(LabelledBuffer):
 	def get_data(self) -> tf.Tensor:
 		return self.feat
 
+	def get_data_latest(self) -> tf.Tensor:
+		return self.feat_latest
+
 	def get_label(self) -> tf.Tensor:
 		return self.label
+
+	def get_label_latest(self) -> tf.Tensor:
+		return self.label_latest
 
 	def get_count(self) -> int:
 		return self.count
@@ -43,12 +51,16 @@ class LabelledFeatureBuffer(LabelledBuffer):
 		else:
 			self.label = input_label
 
-		self.count += self.feat.shape[0]
+		self.count 			+= self.feat.shape[0]
+		self.feat_latest 	= input_feat
+		self.label_latest 	= input_label
 		return
 
 	def clear(self):
 		self.feat 			= None
+		self.feat_latest 	= None
 		self.label 			= None
+		self.label_latest 	= None
 		self.count 			= 0
 		self.last_cleared 	= datetime.datetime.now()
 		return

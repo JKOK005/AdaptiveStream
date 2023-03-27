@@ -13,3 +13,6 @@ class MaxBufferSize(ScalingRules):
 		"""
 		count = buffer.get_counts()
 		return count >= self.max_size
+
+	def reset(self):
+		return

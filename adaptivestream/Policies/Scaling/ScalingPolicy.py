@@ -23,3 +23,7 @@ class ScalingPolicy(ABC):
 	@abstractmethod
 	def train_expert(self, *args, **kwargs):
 		pass
+
+	@abstractmethod
+	def reset(self, *args, **kwargs):
+		pass

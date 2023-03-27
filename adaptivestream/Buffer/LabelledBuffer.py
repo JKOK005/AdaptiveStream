@@ -14,3 +14,10 @@ class LabelledBuffer(Buffer):
 		Returns labels for each data in buffer
 		"""
 		pass
+
+	@abstractmethod
+	def get_label_latest(self, *args, **kwargs) -> tf.Tensor:
+		"""
+		Returns the most recent batch of added labels
+		"""
+		pass
