@@ -32,8 +32,17 @@ class ExpertEnsemble(object):
 				return all([check(rule = each_rule) for each_rule in rule])
 			else:
 				return rule.check_scaling(buffer = self.buffer)
-
 		return any([check(rule = each_rule) for each_rule in self.scaling_rules])
+
+	def _reset_scale(self):
+		for each_rule in self.scaling_rules:
+			each_rule.reset()
+
+		for each_policy in self.scaling_policy:
+			each_policy.reset()
+
+		self.buffer.clear()
+		return
 
 	def _check_to_compact(self):
 		def check(rule):
@@ -41,7 +50,6 @@ class ExpertEnsemble(object):
 				return all([check(rule = each_rule) for each_rule in rule])
 			else:
 				return rule.check_compact(experts = self.experts)
-
 		decisions 	= [check(rule = each_rule) for each_rule in self.compaction_rules]
 		return any(decisions)
 
@@ -58,9 +66,9 @@ class ExpertEnsemble(object):
 			self.experts = new_experts
 
 		if self._check_to_scale():
-			expert 	= self.self.scaling_policy.train_expert()
+			expert = self.self.scaling_policy.train_expert()
 			self.experts.append(expert)
-			self.buffer.clear()
+			self._reset_scale()
 		return
 
 	def infer(self, input_data):

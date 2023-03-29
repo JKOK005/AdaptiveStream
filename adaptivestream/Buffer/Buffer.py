@@ -15,6 +15,13 @@ class Buffer(ABC):
 		pass
 
 	@abstractmethod
+	def get_data_latest(self, *args, **kwargs) -> tf.Tensor:
+		"""
+		Returns the most recent batch of added data
+		"""
+		pass
+
+	@abstractmethod
 	def get_count(self, *args, **kwargs) -> int:
 		pass
 

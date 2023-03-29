@@ -15,3 +15,6 @@ class MaxDuration(ScalingRules):
 		current_time 	= datetime.datetime.now()
 		last_cleared 	= buffer.get_last_cleared()
 		return current_time - last_cleared >= self.max_duration
+
+	def reset(self):
+		return
