@@ -1,7 +1,6 @@
 class ExpertEnsemble(object):
 	experts 			= []
 	fallback_expert 	= None
-
 	scaling_policy 		= None 
 	compaction_policy 	= None
 	buffer 				= None
@@ -38,9 +37,7 @@ class ExpertEnsemble(object):
 		for each_rule in self.scaling_rules:
 			each_rule.reset()
 
-		for each_policy in self.scaling_policy:
-			each_policy.reset()
-
+		self.scaling_policy.reset()
 		self.buffer.clear()
 		return
 
@@ -66,7 +63,7 @@ class ExpertEnsemble(object):
 			self.experts = new_experts
 
 		if self._check_to_scale():
-			expert = self.self.scaling_policy.train_expert()
+			expert = self.scaling_policy.train_expert()
 			self.experts.append(expert)
 			self._reset_scale()
 		return
