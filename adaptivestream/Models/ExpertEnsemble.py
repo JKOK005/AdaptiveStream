@@ -65,11 +65,12 @@ class ExpertEnsemble(object):
 		if self._check_to_scale():
 			expert = self.scaling_policy.train_expert()
 			self.experts.append(expert)
+			print(self.experts)
 			self._reset_scale()
 		return
 
 	def infer(self, input_data):
-		for each_expert in self.experts.reverse():
-			if each_expert.bypass(input_data):
+		for each_expert in reversed(self.experts):
+			if each_expert.permit_entry(input_X = input_data):
 				return each_expert.infer(input_data)
 		return self.fallback_expert.infer(input_data)

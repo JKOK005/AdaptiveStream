@@ -6,7 +6,7 @@ from Buffer import LabelledFeatureBuffer
 from Models import ExpertEnsemble
 from Models.Router import OneClassSVMRouter
 from Models.Wrapper import SupervisedModelWrapper
-from Rules.Scaling import MinBufferSize
+from Rules.Scaling import BufferSizeLimit, OnlineMMDDrift
 from Policies.Compaction import NoCompaction
 from Policies.Scaling import NaiveScaling
 from tensorflow.keras import layers, losses, optimizers, Sequential
@@ -29,7 +29,7 @@ def build_net(input_size, output_size):
 				[
 					tf.keras.Input(shape = (input_size, )),
 					layers.Dense(5, activation = "relu"),
-					layers.Dense(output_size, activation = "relu")
+					layers.Dense(output_size, activation = "sigmoid")
 				]
 			)
 
@@ -46,15 +46,27 @@ if __name__ == "__main__":
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 	# Define scaling rules
-	scaling_rules 	= 	[MinBufferSize(min_size = 512)]
+	scaling_rules 	= 	[
+							OnlineMMDDrift(
+								min_trigger_count 	= 1024,
+								safety_timestep 	= 10,
+								init_params 		= {
+									"ert" 			: 150,
+									"window_size" 	: 5,
+									"n_bootstraps" 	: 2000,
+								}
+							),
+
+							BufferSizeLimit(min_size = 4096)
+						]
 
 	# Define scaling policy
 	model_wrapper 	= 	SupervisedModelWrapper(
 							base_model 		= build_net(12, 1),
-							optimizer 		= optimizers.SGD(learning_rate = 0.0001),
-							loss 			= losses.MeanSquaredError(),
+							optimizer 		= optimizers.SGD(learning_rate = 0.001),
+							loss 			= losses.BinaryCrossentropy(from_logits = False),
 							training_params = {
-								"epochs" 		: 500,
+								"epochs" 		: 1000,
 								"batch_size" 	: 64
 							},
 						)
@@ -78,15 +90,16 @@ if __name__ == "__main__":
 	red = pd.read_csv(
     	"https://storage.googleapis.com/seldon-datasets/wine_quality/winequality-red.csv", sep=';'
 	)
-	red["class"] 	= 0
+	red = red.sample(frac = 1)
+	red["class"] = 0
 
 	white = pd.read_csv(
 	    "https://storage.googleapis.com/seldon-datasets/wine_quality/winequality-white.csv", sep=';'
 	)
+	white = white.sample(frac = 1)
 	white["class"] 	= 1
 
 	all_wines = pd.concat([red, white], axis = 0)
-	all_wines = all_wines.sample(frac = 1)
 
 	feats_as_tensor  = tf.convert_to_tensor(all_wines.drop("class", axis = 1).values, dtype = tf.float32)
 	labels_as_tensor = tf.convert_to_tensor(all_wines["class"].values, dtype = tf.float32)
@@ -94,7 +107,10 @@ if __name__ == "__main__":
 	data_gen 		 = tf.data.Dataset.from_tensor_slices((feats_as_tensor, labels_as_tensor))
 
 	ingested_counts  = 0
-	for batch_feats, batch_labels in data_gen.batch(128).take(12):		
+	for batch_feats, batch_labels in data_gen.batch(1):
 		expert_ensemble.ingest(batch_input = (batch_feats, batch_labels))
 		ingested_counts += len(batch_feats)
 		logging.info(f"Total data ingested: {ingested_counts}")
+
+	# Infer on test data
+	# TODO: Implement inference

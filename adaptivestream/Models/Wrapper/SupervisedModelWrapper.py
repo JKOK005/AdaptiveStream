@@ -27,4 +27,4 @@ class SupervisedModelWrapper(ModelWrapper):
 		return
 
 	def infer(self, input_X, *args, **kwargs):
-		pass
+		return self.model(input_X)
