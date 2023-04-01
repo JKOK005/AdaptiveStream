@@ -52,7 +52,7 @@ if __name__ == "__main__":
 								safety_timestep 	= 10,
 								init_params 		= {
 									"ert" 			: 150,
-									"window_size" 	: 5,
+									"window_size" 	: 20,
 									"n_bootstraps" 	: 2000,
 								}
 							),
@@ -90,27 +90,36 @@ if __name__ == "__main__":
 	red = pd.read_csv(
     	"https://storage.googleapis.com/seldon-datasets/wine_quality/winequality-red.csv", sep=';'
 	)
-	red = red.sample(frac = 1)
-	red["class"] = 0
+	red["class"] 	 = 0
+	red_training 	 = red.sample(frac = 0.8)
+	red_test  	 	 = red.drop(red_training.index)
 
 	white = pd.read_csv(
 	    "https://storage.googleapis.com/seldon-datasets/wine_quality/winequality-white.csv", sep=';'
 	)
-	white = white.sample(frac = 1)
-	white["class"] 	= 1
+	white["class"] 	 = 1
+	white_training 	 = white.sample(frac = 0.8)
+	white_test  	 = white.drop(white_training.index)
 
-	all_wines = pd.concat([red, white], axis = 0)
+	all_training 	  = pd.concat([red_training, white_training], axis = 0)
+	feats_as_tensor   = tf.convert_to_tensor(all_training.drop("class", axis = 1).values, dtype = tf.float32)
+	labels_as_tensor  = tf.convert_to_tensor(all_training["class"].values, dtype = tf.float32)
+	labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
+	data_gen_training = tf.data.Dataset.from_tensor_slices((feats_as_tensor, labels_as_tensor))
 
-	feats_as_tensor  = tf.convert_to_tensor(all_wines.drop("class", axis = 1).values, dtype = tf.float32)
-	labels_as_tensor = tf.convert_to_tensor(all_wines["class"].values, dtype = tf.float32)
+	all_test  		 = pd.concat([red_test, white_test], axis = 0)
+	feats_as_tensor  = tf.convert_to_tensor(all_test.drop("class", axis = 1).values, dtype = tf.float32)
+	labels_as_tensor = tf.convert_to_tensor(all_test["class"].values, dtype = tf.float32)
 	labels_as_tensor = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
-	data_gen 		 = tf.data.Dataset.from_tensor_slices((feats_as_tensor, labels_as_tensor))
+	data_gen_test	 = tf.data.Dataset.from_tensor_slices((feats_as_tensor, labels_as_tensor))
 
 	ingested_counts  = 0
-	for batch_feats, batch_labels in data_gen.batch(1):
+	for batch_feats, batch_labels in data_gen_training.batch(1):
 		expert_ensemble.ingest(batch_input = (batch_feats, batch_labels))
 		ingested_counts += len(batch_feats)
 		logging.info(f"Total data ingested: {ingested_counts}")
 
 	# Infer on test data
-	# TODO: Implement inference
+	for batch_feats, batch_labels in data_gen_test.batch(1):
+		pred = expert_ensemble.infer(input_data = batch_feats)
+		print(pred, batch_labels)

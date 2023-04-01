@@ -64,8 +64,10 @@ class ExpertEnsemble(object):
 
 		if self._check_to_scale():
 			expert = self.scaling_policy.train_expert()
-			self.experts.append(expert)
-			print(self.experts)
+			if self.fallback_expert is not None:
+				self.experts.append(expert)
+			else:
+				self.fallback_expert = expert
 			self._reset_scale()
 		return
 
