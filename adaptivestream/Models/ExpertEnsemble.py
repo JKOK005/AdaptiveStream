@@ -50,6 +50,15 @@ class ExpertEnsemble(object):
 		decisions 	= [check(rule = each_rule) for each_rule in self.compaction_rules]
 		return any(decisions)
 
+	def scale_experts(self):
+		expert = self.scaling_policy.train_expert()
+		if self.fallback_expert is not None:
+			self.experts.append(expert)
+		else:
+			self.fallback_expert = expert
+		self._reset_scale()
+		return
+
 	def ingest(self, batch_input):
 		self.buffer.add(batch_input = batch_input)
 			
@@ -63,16 +72,14 @@ class ExpertEnsemble(object):
 			self.experts = new_experts
 
 		if self._check_to_scale():
-			expert = self.scaling_policy.train_expert()
-			if self.fallback_expert is not None:
-				self.experts.append(expert)
-			else:
-				self.fallback_expert = expert
-			self._reset_scale()
+			self.scale_experts()
 		return
 
 	def infer(self, input_data):
-		for each_expert in reversed(self.experts):
-			if each_expert.permit_entry(input_X = input_data):
-				return each_expert.infer(input_data)
-		return self.fallback_expert.infer(input_data)
+		# TODO: Optimize function to avoid searching across all experts
+		# Linear search is too inefficient. 
+		
+		all_experts = [self.fallback_expert] + self.experts
+		scores 		= [each_expert.score(input_data) for each_expert in all_experts]
+		best_indx   = scores.index(min(scores))
+		return all_experts[best_indx].infer(input_data)

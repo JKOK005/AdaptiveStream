@@ -21,23 +21,24 @@ def build_router(input_size):
 	encoder_net = Sequential(
 					[
 						tf.keras.Input(shape = (input_size, )),						
+						layers.Dense(10, activation = "relu"),
 						layers.Dense(5, activation = "relu"),
-						layers.Dense(2, activation = "relu"),
 					]
 				)
 
 	decoder_net = Sequential(
 					[
 						tf.keras.Input(shape = (16, )),
-						layers.Dense(2, activation = "relu"),
 						layers.Dense(5, activation = "relu"),
+						layers.Dense(10, activation = "relu"),
 						layers.Dense(input_size),
 					]
 				)
 
 	return	OutlierVAERouter(
 				init_params = {
-					"threshold" 	: 0.1,
+					"threshold" 	: 0.75,
+					"score_type" 	: "mse",
 					"encoder_net" 	: encoder_net,
 					"decoder_net" 	: decoder_net,
 					"latent_dim" 	: 16,

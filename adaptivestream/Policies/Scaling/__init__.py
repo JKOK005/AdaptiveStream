@@ -1,1 +1,2 @@
 from Policies.Scaling.NaiveScaling import NaiveScaling
+from Policies.Scaling.NaiveKnowledgeTransfer import NaiveKnowledgeTransfer

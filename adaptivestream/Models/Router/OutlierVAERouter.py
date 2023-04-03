@@ -34,6 +34,14 @@ class OutlierVAERouter(Router):
 		Performs outlier detection on a single input_x target.
 		If is_outlier result is 0, the data is accepted and passes through the gate.
 		"""
-		self.inference_params["outlier_type"] = "instance"
-		pred 	= self.classifier.predict(input_X, **self.inference_params)
-		return pred["data"]["is_outlier"][0] == 0
+		self.inference_params["outlier_type"] 			= "instance"
+		pred = self.classifier.predict(input_X, **self.inference_params)
+		return pred["data"]["is_outlier"][0] == 3
+
+	def score(self, input_X: tf.Tensor,
+					*args, **kwargs
+			) -> float:
+		self.inference_params["outlier_type"] 			= "instance"
+		self.inference_params["return_instance_score"] 	= True
+		pred = self.classifier.predict(input_X, **self.inference_params)
+		return pred["data"]["instance_score"][0]
