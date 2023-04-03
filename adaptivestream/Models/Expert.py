@@ -28,3 +28,9 @@ class Expert(object):
 
 	def infer(self, input_X, *args, **kwargs):
 		return self.trained_model.infer(input_X = input_X)
+	
+	def evaluate(self, input_X, input_y, *args, **kwargs):
+		return self.trained_model.evaluate(input_X = input_X, input_y = input_y)
+	
+	def loss(self, input_X, input_y, *args, **kwargs):
+		return self.trained_model.loss(input_X = input_X, input_y = input_y)
