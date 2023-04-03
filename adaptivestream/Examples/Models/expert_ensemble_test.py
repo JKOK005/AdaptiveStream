@@ -165,8 +165,8 @@ if __name__ == "__main__":
 	# Infer on test data
 	preds 	= None
 	labels 	= None
+
 	for batch_feats, batch_labels in data_gen_test.batch(1):
-		print(batch_labels)
 		pred 	= expert_ensemble.infer(input_data = batch_feats)
 		preds 	= pred if preds is None else tf.concat([preds, pred], axis = 0)
 		labels 	= batch_labels if labels is None else tf.concat([labels, batch_labels], axis = 0)
