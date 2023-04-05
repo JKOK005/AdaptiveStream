@@ -20,6 +20,12 @@ class Expert(object):
 		"""
 		return self.router.permit_entry(input_X = input_X)
 
+	def score(self, input_X, *args, **kwargs):
+		"""
+		Assigns a score to the new datapoint. The higher the score, the more likely the point is an outlier.
+		"""
+		return self.router.score(input_X = input_X)
+
 	def infer(self, input_X, *args, **kwargs):
 		return self.trained_model.infer(input_X = input_X)
 	

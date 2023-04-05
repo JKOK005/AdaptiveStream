@@ -30,3 +30,9 @@ class OneClassSVMRouter(Router):
 		"""
 		predicted_cls = self.classifier.predict(input_X)
 		return predicted_cls[0] == 1
+
+	def score(self, input_X: tf.Tensor,
+					*args, **kwargs
+			) -> float:
+		score = self.classifier.score_samples(input_X)
+		return 1 / (score[0] + 1e-3)

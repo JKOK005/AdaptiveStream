@@ -37,17 +37,17 @@ if __name__ == "__main__":
 	red_feats_as_tensor  	= tf.convert_to_tensor(red, dtype = tf.float32)
 	red_labels_as_tensor  	= tf.ones([red_feats_as_tensor.shape[0], 1])
 
-	training_feats  	= white_feats_as_tensor[:-500]
-	training_labels  	= white_labels_as_tensor[:-500]
+	training_feats  	= white_feats_as_tensor[:2048]
+	training_labels  	= white_labels_as_tensor[:2048]
 
 	# Initialize and load data into the buffer
 	buffer 	= LabelledFeatureBuffer()
 	buffer.add(batch_input = (training_feats, training_labels))
 
-	mmd_drift = OnlineMMDDrift(	min_trigger_count = 3000,
-								safety_timestep = 20,
+	mmd_drift = OnlineMMDDrift(	min_trigger_count = 2000,
+								safety_timestep = 10,
 								init_params = {
-									"ert" 			: 100,
+									"ert" 			: 150,
 									"window_size" 	: 50,
 									"n_bootstraps" 	: 2000,
 								}
@@ -57,11 +57,11 @@ if __name__ == "__main__":
 	mmd_drift.check_scaling(buffer = buffer)
 
 	for seed in range(20):
-		non_drift_feats  	= tf.random.shuffle(white_feats_as_tensor[-500:], seed = seed)
-		non_drift_labels  	= white_labels_as_tensor[-500:]
+		non_drift_feats  	= tf.random.shuffle(white_feats_as_tensor[2048:], seed = seed)
+		non_drift_labels  	= white_labels_as_tensor[2048:]
 
-		drift_feats  		= tf.random.shuffle(red_feats_as_tensor[0:500], seed = seed)
-		drift_labels  		= red_labels_as_tensor[0:500]
+		drift_feats  		= tf.random.shuffle(red_feats_as_tensor, seed = seed)
+		drift_labels  		= red_labels_as_tensor
 
 		drift_time = 0
 		mmd_drift.drift_model.reset_state()

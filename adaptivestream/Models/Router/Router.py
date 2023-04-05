@@ -17,3 +17,13 @@ class Router(ABC):
 		If true, permit entry to the expert.
 		"""
 		pass
+
+	@abstractmethod
+	def score(self, *args, **kwargs) -> float:
+		"""
+		Score measures the degree of which the data is considered as an outlier to the trained distribution.
+
+		The higher the score, the more the data is regarded as an outlier.
+		ATTN: It is important to follow this convention when building future router classes.
+		"""
+		pass

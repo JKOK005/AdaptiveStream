@@ -16,8 +16,8 @@ def build_router(input_size):
 	return	OneClassSVMRouter(
 				init_params = {
 					"kernel" 	: "rbf",
-					"degree" 	: 3,
-					"max_iter" 	: 1000
+					"degree" 	: 4,
+					"max_iter" 	: 10000
 				},
 			)
 
@@ -41,8 +41,11 @@ if __name__ == "__main__":
 	router.train(buffer = buffer)
 
 	# Perform outlier detection
-	test_data  		= feats_as_tensor[-1, None]
+	test_data  		= feats_as_tensor[-1:]
 	rand_data 		= tf.random.uniform([1, feats_as_tensor.shape[1]])
 	
-	print(f"Test data passes router selection: {router.permit_entry(input_X = test_data)}")
-	print(f"Random data passes router selection: {router.permit_entry(input_X = rand_data)}")
+	print(f"Test data passes router selection: {router.permit_entry(input_X = test_data)} \
+			with score: {router.score(input_X = test_data)}")
+	
+	print(f"Random data passes router selection: {router.permit_entry(input_X = rand_data)} \
+			with score: {router.score(input_X = rand_data)}")
