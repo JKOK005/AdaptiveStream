@@ -56,13 +56,15 @@ class ExpertEnsemble(object):
 			self.experts.append(expert)
 		else:
 			self.fallback_expert = expert
-		self._reset_scale()
 		return
 
 	def ingest(self, batch_input):
 		self.buffer.add(batch_input = batch_input)
+
+		is_compact 	= self._check_to_compact()
+		is_scale  	= self._check_to_scale()
 			
-		if self._check_to_compact():
+		if is_compact:
 			(new_fallback_expert, new_experts) 	= self.compaction_policy.compact(
 													expert_chain = self.experts, 
 													prev_fallback_expert = self.fallback_expert, 
@@ -71,14 +73,13 @@ class ExpertEnsemble(object):
 			self.fallback_expert = new_fallback_expert
 			self.experts = new_experts
 
-		if self._check_to_scale():
+		if is_scale:
 			self.scale_experts()
+			self._reset_scale()
+			
 		return
 
 	def infer(self, input_data):
-		# TODO: Optimize function to avoid searching across all experts
-		# Linear search is too inefficient. 
-		
 		all_experts = [self.fallback_expert] + self.experts
 		scores 		= [each_expert.score(input_data) for each_expert in all_experts]
 		best_indx   = scores.index(min(scores))
