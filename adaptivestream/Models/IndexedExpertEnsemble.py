@@ -1,3 +1,4 @@
+from Math import CusterTools
 from Models.ExpertEnsemble import ExpertEnsemble
 from operator import itemgetter
 
@@ -18,9 +19,8 @@ class IndexedTreeNode(object):
 
 	def compute_exemplar(self):
 		expert_indexes 	= np.concatenate([each_expert.get_index() for each_expert in self.experts], axis = 0)
-		mean_of_cluster = np.mean(expert_indexes, axis = 0)
-		dist_to_mean  	= np.sum((expert_indexes - mean_of_cluster) ** 2, axis = 1)
-		return self.experts[dist_to_mean.argmin()]
+		exemplar_indx  	= ClusterTools.exemplar_selection(indexes = expert_indexes)
+		return self.experts[exemplar_indx]
 	
 	def get_experts(self):
 		return self.experts
@@ -62,13 +62,10 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 						is_leaf  	= True
 					)
 
-		expert_indexes 	= np.concatenate([each_expert.get_index() for each_expert in experts], 
-										 axis = 0)
-		
-		kmeans_cluster  = KMeans(n_clusters = self.k_clusters, random_state = 0, n_init = "auto").fit(expert_indexes)
-		expert_class  	= kmeans.labels_
+		expert_indexes 	= np.concatenate([each_expert.get_index() for each_expert in experts], axis = 0)
+		expert_class  	= ClusterTools.k_means_cluster(indexes = expert_indexes, clusters = self.k_clusters)
+		children 		= []
 
-		children 	= []
 		for each_cls in range(self.k_clusters):
 			individual_cls_indx  	= np.where(expert_class == each_cls)[0]
 			individual_cls_experts 	= list(itemgetter(*individual_cls_indx)(experts))

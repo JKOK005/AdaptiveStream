@@ -25,4 +25,4 @@ class ClusterTools(object):
 		"""
 		mean_of_index = np.mean(indexes, axis = 0)
 		dist_to_mean  = np,sum((indexes - mean_of_index) ** 2, axis = 1)
-		return int(np.argmin(dist_to_mean, axis = 0))
+		return dist_to_mean.argmin()
