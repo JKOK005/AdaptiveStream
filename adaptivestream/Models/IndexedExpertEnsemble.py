@@ -2,6 +2,7 @@ from Models.ExpertEnsemble import ExpertEnsemble
 from operator import itemgetter
 
 class IndexedTreeNode(object):
+	exemplar  	= None
 	experts 	= []
 	children  	= []
 	is_leaf 	= False
@@ -13,9 +14,19 @@ class IndexedTreeNode(object):
 		self.experts 	= experts
 		self.children 	= children
 		self.is_leaf  	= is_leaf
+		self.exemplar 	= self.compute_exemplar()
 
+	def compute_exemplar(self):
+		expert_indexes 	= np.concatenate([each_expert.get_index() for each_expert in self.experts], axis = 0)
+		mean_of_cluster = np.mean(expert_indexes, axis = 0)
+		dist_to_mean  	= np.sum((expert_indexes - mean_of_cluster) ** 2, axis = 1)
+		return self.experts[dist_to_mean.argmin()]
+	
 	def get_experts(self):
 		return self.experts
+
+	def get_exemplar(self):
+		return self.exemplar
 
 	def get_children(self):
 		return self.children
@@ -27,19 +38,20 @@ class IndexedTreeNode(object):
 class IndexedExpertEnsemble(ExpertEnsemble):
 	indexed_tree = None
 
-	def __init__(self, 	index_expert_count: int, 
+	def __init__(self, 	leaf_expert_count: int,
+						k_clusters: int,
 						*args, **kwargs
 				):
 		"""
 		Class most shares similar features with ExpertEnsemble. 
-		In addition, we build a K-means index over all fore front experts.
+		In addition, we build a K-means index over all frontier experts.
 		This process allows search to be reduced from O(N) -> O(log N) to support high QPS for the application.
 
-		params: index_expert_count : controls the number of experts per index tree node
+		params: leaf_expert_count : controls the number of experts per index tree node
 		"""
 		super(IndexedExpertEnsemble, self).__init__(*args, **kwargs)
-
-		self.index_expert_count = index_expert_count
+		self.leaf_expert_count 	= leaf_expert_count
+		self.k_clusters 		= k_clusters
 		return
 
 	def build_index_tree(self, experts):
@@ -52,12 +64,26 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 
 		expert_indexes 	= np.concatenate([each_expert.get_index() for each_expert in experts], 
 										 axis = 0)
+		
+		kmeans_cluster  = KMeans(n_clusters = self.k_clusters, random_state = 0, n_init = "auto").fit(expert_indexes)
+		expert_class  	= kmeans.labels_
 
-		for each_cls in range(self.index_expert_count):
-			individual_cls_indx  	= np.where(expert_indexes == each_cls)[0]
+		children 	= []
+		for each_cls in range(self.k_clusters):
+			individual_cls_indx  	= np.where(expert_class == each_cls)[0]
 			individual_cls_experts 	= list(itemgetter(*individual_cls_indx)(experts))
+			child_node  			= self.build_index_tree(experts = individual_cls_experts)
+			children.append(child_node)
 
+		return 	IndexedTreeNode(
+					experts 	= experts,
+					children 	= children,
+					is_leaf  	= False
+				)
 
+	def _index_last(self):
+		# TODO: Logic to index last expert after scaling
+		pass
 
 	def ingest(self, batch_input):
 		self.buffer.add(batch_input = batch_input)
@@ -77,10 +103,11 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		if is_scale:
 			self.scale_experts()
 			self._reset_scale()
+			self._index_last()
 
 		if is_compact or is_scale:
-			# TODO: Rebuild K means index tree
-			pass
+			# Rebuild K means index tree
+			self.indexed_tree 	= self.build_index_tree(experts = self.experts)
 
 		return
 
