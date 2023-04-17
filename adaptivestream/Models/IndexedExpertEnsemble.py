@@ -1,5 +1,5 @@
 from Math import CusterTools
-from Models.ExpertEnsemble import ExpertEnsemble
+from Models import Expert, ExpertEnsemble
 from operator import itemgetter
 
 class IndexedTreeNode(object):
@@ -8,9 +8,9 @@ class IndexedTreeNode(object):
 	children  	= []
 	is_leaf 	= False
 
-	def __init__(self, 	experts, 
-						children, 
-						is_leaf
+	def __init__(self, 	experts: [Expert], 
+						children: [IndexedTreeNode], 
+						is_leaf: bool
 				):
 		self.experts 	= experts
 		self.children 	= children
@@ -47,7 +47,8 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		In addition, we build a K-means index over all frontier experts.
 		This process allows search to be reduced from O(N) -> O(log N) to support high QPS for the application.
 
-		params: leaf_expert_count : controls the number of experts per index tree node
+		params: leaf_expert_count 	: controls the number of experts per index tree node
+		params: k_clusters 			: number of clusters to split the indexed tree
 		"""
 		super(IndexedExpertEnsemble, self).__init__(*args, **kwargs)
 		self.leaf_expert_count 	= leaf_expert_count
