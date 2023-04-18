@@ -100,8 +100,8 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 
 		if is_scale:
 			self.scale_experts()
-			self._reset_scale()
 			self._index_last()
+			self._reset_scale()
 
 		if is_compact or is_scale:
 			# Rebuild K means index tree
