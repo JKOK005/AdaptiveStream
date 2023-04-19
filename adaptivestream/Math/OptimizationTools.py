@@ -21,8 +21,9 @@ class OptimizationTools(object):
 	def optimize(expert_index: np.array, 
 				 target_dist: np.array,
 				 epochs: int, 
+				 optim_params,
 				 early_stopping_tol: float = 1e-4,
-				 optim_params
+				 l2_ratio: float = 0.1
 			) -> np.array:
 		"""
 		Given 
@@ -35,19 +36,27 @@ class OptimizationTools(object):
 
 		We will use the KL-divergence to compute distribution differences
 		"""
-		assigned_index 	= tf.Variable(tf.random.uniform(shape = (expert_index.shape[-1],)), trainable = True)
+		assigned_index 	= tf.Variable(
+							tf.random.uniform(	shape = (expert_index.shape[-1],), 
+												minval = 0, 
+												maxval = 1
+											), 
+							trainable = True
+						)
+
 		optimizer 		= tf.keras.optimizers.Adam(**optim_params)
 		loss 			= KLDivergence()
 
 		for _ in range(epochs):
 			with tf.GradientTape() as tape:
-				dist  		= tf.math.reduce_sum((expert_index - assigned_index) ** 2. axis = 1)
+				dist  		= tf.math.reduce_sum((expert_index - assigned_index) ** 2, axis = 1)
 				pred_dist 	= tf.nn.softmax(dist)
-				cost 		= loss(target_dist, pred_dist)
-			
-			grad = tape.gradient(loss, assigned_index)
+				cost 		= (1 - l2_ratio) * loss(target_dist, pred_dist) + l2_ratio * tf.math.reduce_sum(assigned_index ** 2, axis = 0)
+
+			grad = tape.gradient(cost, assigned_index)
 			optimizer.apply_gradients([(grad, assigned_index)])
 
-			if tf.math.reduce_sum(grad ** 2. axis = 0) <= early_stopping_tol:
+			if tf.math.reduce_sum(grad ** 2, axis = 0) <= early_stopping_tol:
 				break
+
 		return assigned_index.numpy()
