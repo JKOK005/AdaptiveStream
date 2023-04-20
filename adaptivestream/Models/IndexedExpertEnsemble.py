@@ -1,6 +1,7 @@
-from Math import CusterTools
+from __future__ import annotations
+from Math import ClusterTools
 from Models import Expert, ExpertEnsemble
-from operator import itemgetter
+import numpy as np
 
 class IndexedTreeNode(object):
 	exemplar  	= None
@@ -18,8 +19,11 @@ class IndexedTreeNode(object):
 		self.exemplar 	= self.compute_exemplar()
 
 	def compute_exemplar(self):
-		expert_indexes 	= np.concatenate([each_expert.get_index() for each_expert in self.experts], axis = 0)
-		exemplar_indx  	= ClusterTools.exemplar_selection(indexes = expert_indexes)
+		if len(self.experts) == 1:
+			exemplar_indx = 0 
+		else:
+			expert_indexes 	= np.vstack([each_expert.get_index() for each_expert in self.experts])
+			exemplar_indx  	= ClusterTools.exemplar_selection(indexes = expert_indexes)
 		return self.experts[exemplar_indx]
 	
 	def get_experts(self):
@@ -34,42 +38,34 @@ class IndexedTreeNode(object):
 	def is_leaf(self):
 		return self.is_leaf
 
-
-class IndexedExpertEnsemble(ExpertEnsemble):
-	indexed_tree = None
-
-	def __init__(self, 	leaf_expert_count: int,
-						k_clusters: int,
+class IndexTreeBuilder(object):
+	def __init__(self, 	leaf_expert_count: int, 
+						k_clusters: int, 
 						*args, **kwargs
 				):
 		"""
-		Class most shares similar features with ExpertEnsemble. 
-		In addition, we build a K-means index over all frontier experts.
-		This process allows search to be reduced from O(N) -> O(log N) to support high QPS for the application.
-
 		params: leaf_expert_count 	: controls the number of experts per index tree node
 		params: k_clusters 			: number of clusters to split the indexed tree
 		"""
-		super(IndexedExpertEnsemble, self).__init__(*args, **kwargs)
 		self.leaf_expert_count 	= leaf_expert_count
 		self.k_clusters 		= k_clusters
 		return
 
-	def build_index_tree(self, experts):
-		if len(experts) <= self.index_expert_count:
+	def build_index_tree(self, experts: [Expert]) -> IndexedTreeNode:
+		if len(experts) <= self.leaf_expert_count:
 			return 	IndexedTreeNode(
 						experts 	= experts,
 						children 	= [],
 						is_leaf  	= True
 					)
 
-		expert_indexes 	= np.concatenate([each_expert.get_index() for each_expert in experts], axis = 0)
-		expert_class  	= ClusterTools.k_means_cluster(indexes = expert_indexes, clusters = self.k_clusters)
+		expert_indexes 	= np.vstack([each_expert.get_index() for each_expert in experts])
+		expert_class  	= ClusterTools.k_means_cluster(indexes = expert_indexes, clusters = self.k_clusters, n_init = 10)
 		children 		= []
 
 		for each_cls in range(self.k_clusters):
 			individual_cls_indx  	= np.where(expert_class == each_cls)[0]
-			individual_cls_experts 	= list(itemgetter(*individual_cls_indx)(experts))
+			individual_cls_experts 	= [experts[indx] for indx in individual_cls_indx]
 			child_node  			= self.build_index_tree(experts = individual_cls_experts)
 			children.append(child_node)
 
@@ -78,6 +74,23 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 					children 	= children,
 					is_leaf  	= False
 				)
+
+class IndexedExpertEnsemble(ExpertEnsemble):
+	indexed_tree = None
+
+	def __init__(self, 	tree_builder: IndexTreeBuilder,
+						*args, **kwargs
+				):
+		"""
+		Class most shares similar features with ExpertEnsemble. 
+		In addition, we build a K-means index over all frontier experts.
+		This process allows search to be reduced from O(N) -> O(log N) to support high QPS for the application.
+
+		params: tree_builder 	: Object to build index tree
+		"""
+		super(IndexedExpertEnsemble, self).__init__(*args, **kwargs)
+		self.tree_builder 	= tree_builder
+		return
 
 	def _index_last(self):
 		# TODO: Logic to index last expert after scaling
@@ -105,7 +118,7 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 
 		if is_compact or is_scale:
 			# Rebuild K means index tree
-			self.indexed_tree 	= self.build_index_tree(experts = self.experts)
+			self.indexed_tree 	= tree_builder.build_index_tree(experts = self.experts)
 
 		return
 

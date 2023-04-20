@@ -1,2 +1,3 @@
 from Models.Expert import Expert
 from Models.ExpertEnsemble import ExpertEnsemble
+from Models.IndexedExpertEnsemble import IndexedExpertEnsemble, IndexTreeBuilder

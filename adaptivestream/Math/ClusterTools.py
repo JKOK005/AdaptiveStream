@@ -24,5 +24,5 @@ class ClusterTools(object):
 		return the expert whose index is closest to the cluster mean. 
 		"""
 		mean_of_index = np.mean(indexes, axis = 0)
-		dist_to_mean  = np,sum((indexes - mean_of_index) ** 2, axis = 1)
+		dist_to_mean  = np.sum((indexes - mean_of_index) ** 2, axis = 1)
 		return dist_to_mean.argmin()
