@@ -18,7 +18,9 @@ class SupervisedModelWrapper(ModelWrapper):
 		self.logger  			= logging.getLogger("SupervisedModelWrapper")
 		return
 
-	def train(self, buffer: Buffer, *args, **kwargs):
+	def train(	self, buffer: Buffer, 
+				*args, **kwargs
+			):
 		buffer_feat 	= buffer.get_data()
 		buffer_label 	= buffer.get_label()
 
@@ -26,5 +28,7 @@ class SupervisedModelWrapper(ModelWrapper):
 		self.model.fit(buffer_feat, buffer_label, **self.training_params)
 		return
 
-	def infer(self, input_X, *args, **kwargs):
+	def infer(	self, input_X: tf.Tensor, 
+				*args, **kwargs
+			):
 		return self.model(input_X)

@@ -1,5 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
+from Buffer.Buffer import Buffer
 from Models.Wrapper.ModelWrapper import ModelWrapper
 from Models.Router.Router import Router
 
@@ -16,7 +17,7 @@ class ScalingPolicy(ABC):
 		self.router_template 	= router
 		return
 
-	def set_buffer(self, buffer):
+	def set_buffer(self, buffer: Buffer):
 		self.buffer = buffer
 		return
 

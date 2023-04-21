@@ -1,4 +1,5 @@
 import numpy as np
+import tensorflow as tf
 import time
 from Math import OptimizationTools
 from matplotlib import pyplot as plt
@@ -18,9 +19,9 @@ if __name__ == "__main__":
 	expert_index 	= np.random.uniform(low = 0, high = 1, size = (num_experts, 2)) 	# k x n, k being the number of experts and n the index dim
 	target_dist     = np.sum((expert_index - expert_index[selected_expert]) ** 2, axis = 1)
 	target_dist  	= softmax(target_dist)
+	target_dist 	= tf.convert_to_tensor(target_dist)
 	
 	start = time.time()
-
 	assigned_index  = OptimizationTools.optimize(expert_index = expert_index,
 												 target_dist = target_dist,
 												 epochs = 10000,
@@ -28,7 +29,6 @@ if __name__ == "__main__":
 												 l2_ratio = 0.01,
 												 optim_params = {"learning_rate" : 0.05},
 												)
-
 	print(f"Time: {time.time() - start}")
 
 	plt.xlabel("X") 

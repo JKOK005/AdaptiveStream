@@ -76,7 +76,8 @@ class IndexTreeBuilder(object):
 				)
 
 class IndexedExpertEnsemble(ExpertEnsemble):
-	indexed_tree = None
+	indexed_tree 	= None
+	tree_builder 	= None
 
 	def __init__(self, 	tree_builder: IndexTreeBuilder,
 						*args, **kwargs
@@ -93,7 +94,9 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		return
 
 	def _index_last(self):
-		# TODO: Logic to index last expert after scaling
+		newest_expert 		= self.experts[-1]
+		historical_experts 	= self.experts[:-1]
+
 		pass
 
 	def ingest(self, batch_input):
@@ -118,7 +121,7 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 
 		if is_compact or is_scale:
 			# Rebuild K means index tree
-			self.indexed_tree 	= tree_builder.build_index_tree(experts = self.experts)
+			self.indexed_tree 	= self.tree_builder.build_index_tree(experts = self.experts)
 
 		return
 
