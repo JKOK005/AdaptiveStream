@@ -8,7 +8,7 @@ class OptimizationTools(object):
 	@staticmethod
 	def loss_dist(	expert_set: [Expert], 
 					input_X: tf.Tensor
-				) -> np.array:
+				) -> tf.Tensor:
 		"""
 		Generates loss distribution of single expert relative to all other experts in the set, given a single instance of input_X.
 
@@ -18,7 +18,7 @@ class OptimizationTools(object):
 		params: input_X 	: Singular input tensor to evaluate expert score over.
 		"""
 		loss = [expert.score(input_X = input_X) for expert in expert_set]
-		return np.array(loss)
+		return tf.convert_to_tensor(loss)
 
 	@staticmethod
 	def optimize(expert_index: np.array, 

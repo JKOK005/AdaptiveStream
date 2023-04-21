@@ -1,7 +1,8 @@
 from __future__ import annotations
-from Math import ClusterTools
+from Math import ClusterTools, OptimizationTools
 from Models import Expert, ExpertEnsemble
 import numpy as np
+import tensorflow as tf
 
 class IndexedTreeNode(object):
 	exemplar  	= None
@@ -78,8 +79,10 @@ class IndexTreeBuilder(object):
 class IndexedExpertEnsemble(ExpertEnsemble):
 	indexed_tree 	= None
 	tree_builder 	= None
+	index_dim 		= None
 
 	def __init__(self, 	tree_builder: IndexTreeBuilder,
+						index_dim: int, 
 						*args, **kwargs
 				):
 		"""
@@ -88,18 +91,45 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		This process allows search to be reduced from O(N) -> O(log N) to support high QPS for the application.
 
 		params: tree_builder 	: Object to build index tree
+		params: index_dim 		: R^(dim) space for each expert index
 		"""
 		super(IndexedExpertEnsemble, self).__init__(*args, **kwargs)
 		self.tree_builder 	= tree_builder
+		self.index_dim  	= index_dim
 		return
 
 	def _index_last(self):
-		newest_expert 		= self.experts[-1]
-		historical_experts 	= self.experts[:-1]
+		if len(self.experts > 0):
+			latest_expert = self.experts[-1]
 
-		newest_data_batch  	= self.buffer.get_data_latest()
-		# TODO: Continue implementation of optimization 
-		pass
+			if len(self.experts <= 3):
+				assigned_index 				= np.random.uniform(low = 0, high = 1, size = (self.index_dim))
+
+			else:
+				latest_batch_data  			= self.buffer.get_data_latest()
+				historical_experts 			= self.experts[:-1]
+				historical_experts_index 	= np.vstack([each_expert.get_index() for each_expert in historical_experts])
+
+				latest_batch_score  = tf.stack([
+										OptimizationTools.loss_dist(expert_set = historical_experts, 
+																	input_X = each_data)
+										for each_data in latest_batch_data
+									], axis = 0)
+				
+				average_score  		= tf.math.reduce_mean(latest_batch_score, axis = 0)
+				target_dist  		= tf.nn.softmax(average_score, axis = 0)
+
+				assigned_index 		= OptimizationTools.optimize(	
+											expert_index = historical_experts_index,
+											target_dist = target_dist,
+											epochs = 10000,
+											early_stopping_tol = 1e-6,
+											l2_ratio = 0.01,
+											optim_params = {"learning_rate" : 0.05},
+										)
+
+			latest_expert.set_index(new_index = assigned_index)
+		return
 
 	def ingest(self, batch_input):
 		self.buffer.add(batch_input = batch_input)
