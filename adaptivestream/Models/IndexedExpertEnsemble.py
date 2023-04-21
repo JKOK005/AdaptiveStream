@@ -97,6 +97,8 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		newest_expert 		= self.experts[-1]
 		historical_experts 	= self.experts[:-1]
 
+		newest_data_batch  	= self.buffer.get_data_latest()
+		# TODO: Continue implementation of optimization 
 		pass
 
 	def ingest(self, batch_input):
