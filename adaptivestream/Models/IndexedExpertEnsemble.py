@@ -26,16 +26,16 @@ class IndexedTreeNode(object):
 			exemplar_indx  	= ClusterTools.exemplar_selection(indexes = expert_indexes)
 		return self.experts[exemplar_indx]
 	
-	def get_experts(self):
+	def get_experts(self) -> [Expert]:
 		return self.experts
 
-	def get_exemplar(self):
+	def get_exemplar(self) -> Expert:
 		return self.exemplar
 
-	def get_children(self):
+	def get_children(self) -> [IndexedTreeNode]:
 		return self.children
 
-	def is_leaf(self):
+	def check_leaf(self) -> bool:
 		return self.is_leaf
 
 class IndexTreeBuilder(object):
