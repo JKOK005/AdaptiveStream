@@ -17,7 +17,7 @@ class IndexedTreeNode(object):
 		self.experts 	= experts
 		self.children 	= children
 		self.is_leaf  	= is_leaf
-		self.exemplar 	= self.compute_exemplar()
+		self.exemplar 	= self.compute_exemplar() if len(experts) > 0 else None
 
 	def compute_exemplar(self):
 		if len(self.experts) == 1:
@@ -99,10 +99,10 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		return
 
 	def _index_last(self):
-		if len(self.experts > 0):
+		if len(self.experts) > 0:
 			latest_expert = self.experts[-1]
 
-			if len(self.experts <= 3):
+			if len(self.experts) <= 3:
 				assigned_index 				= np.random.uniform(low = 0, high = 1, size = (self.index_dim))
 
 			else:
@@ -154,7 +154,6 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		if is_compact or is_scale:
 			# Rebuild K means index tree
 			self.indexed_tree 	= self.tree_builder.build_index_tree(experts = self.experts)
-
 		return
 
 	def infer(self, input_data):
