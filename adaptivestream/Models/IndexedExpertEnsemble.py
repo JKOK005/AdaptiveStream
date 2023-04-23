@@ -102,24 +102,25 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		if len(self.experts) > 0:
 			latest_expert = self.experts[-1]
 
-			if len(self.experts) <= 3:
+			if len(self.experts) <= 2:
 				assigned_index 				= np.random.uniform(low = 0, high = 1, size = (self.index_dim))
 
 			else:
-				latest_batch_data  			= self.buffer.get_data_latest()
+				latest_batch_data  			= self.buffer.get_data()
 				historical_experts 			= self.experts[:-1]
 				historical_experts_index 	= np.vstack([each_expert.get_index() for each_expert in historical_experts])
 
 				latest_batch_score  = tf.stack([
-										OptimizationTools.loss_dist(expert_set = historical_experts, 
-																	input_X = each_data)
-										for each_data in latest_batch_data
+										OptimizationTools.loss_dist(
+											expert_set = historical_experts, 
+											input_X = tf.expand_dims(each_data, axis = 0)
+										) for each_data in latest_batch_data
 									], axis = 0)
 				
 				average_score  		= tf.math.reduce_mean(latest_batch_score, axis = 0)
 				target_dist  		= tf.nn.softmax(average_score, axis = 0)
 
-				assigned_index 		= OptimizationTools.optimize(	
+				assigned_index 		= OptimizationTools.optimize(
 											expert_index = historical_experts_index,
 											target_dist = target_dist,
 											epochs = 10000,
@@ -128,6 +129,7 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 											optim_params = {"learning_rate" : 0.05},
 										)
 
+			print(f"Assigned index: {assigned_index}")
 			latest_expert.set_index(new_index = assigned_index)
 		return
 

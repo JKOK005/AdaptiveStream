@@ -1,10 +1,12 @@
 import numpy as np
+from typing import Any, Dict
 from Models.Router.Router import Router
 from Models.Wrapper.ModelWrapper import ModelWrapper
 
 class Expert(object):
 	trained_model 	= None
 	router 			= None
+	tags 			= None
 
 	def __init__(self, 	trained_model: ModelWrapper, 
 						router: Router,
@@ -40,5 +42,11 @@ class Expert(object):
 	def get_index(self):
 		return self.index
 
+	def get_tags(self):
+		return self.tags
+
 	def set_index(self, new_index: np.ndarray):
 		self.index = new_index
+
+	def set_tags(self, tags: Dict[str, Any]):
+		self.tags = tags
