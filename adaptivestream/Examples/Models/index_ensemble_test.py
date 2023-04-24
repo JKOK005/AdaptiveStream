@@ -65,7 +65,7 @@ def build_router(input_size):
 				},
 
 				training_params = {
-					"epochs" 		: 100,
+					"epochs" 		: 20,
 					"batch_size" 	: 64,
 					"loss_fn" 		: elbo,
 					"optimizer" 	: optimizers.Adam(learning_rate=5e-3),
@@ -80,7 +80,9 @@ if __name__ == "__main__":
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 	# Define scaling rules
-	scaling_rules 	= 	[BufferSizeLimit(min_size = 256)]	
+	scaling_rules 	= 	[
+							BufferSizeLimit(min_size = 256)
+						]	
 
 	# Define scaling policy
 	model_wrapper 	= 	SupervisedModelWrapper(
@@ -88,7 +90,7 @@ if __name__ == "__main__":
 							optimizer 		= optimizers.SGD(learning_rate = 0.001),
 							loss 			= losses.BinaryCrossentropy(from_logits = False),
 							training_params = {
-								"epochs" 		: 100,
+								"epochs" 		: 1000,
 								"batch_size" 	: 64
 							},
 						)
@@ -102,7 +104,7 @@ if __name__ == "__main__":
 
 	tree_builder 	= IndexTreeBuilder(
 						leaf_expert_count = 3, 
-						k_clusters = 2
+						k_clusters = 4
 					)
 
 	expert_ensemble = IndexedExpertEnsemble(
@@ -156,11 +158,24 @@ if __name__ == "__main__":
 		ingested_counts += len(batch_feats)
 		logging.info(f"Total data ingested: {ingested_counts}")
 
-	experts 	= expert_ensemble.experts
+	# Infer on test data
+	preds 	= None
+	labels 	= None
 
-	plt.xlabel("X") 
-	plt.ylabel("Y") 
+	for batch_feats, batch_labels in data_gen_test.batch(1):
+		pred 	= expert_ensemble.infer(input_data = batch_feats)
+		preds 	= pred if preds is None else tf.concat([preds, pred], axis = 0)
+		labels 	= batch_labels if labels is None else tf.concat([labels, batch_labels], axis = 0)
 
+	preds  	= tf.where(preds >= 0.5, 1, 0)
+	mat 	= tf.math.confusion_matrix(
+	    		labels 		= tf.squeeze(labels),
+			    predictions = tf.squeeze(preds),
+			    num_classes = 2,
+			)
+	print(mat)
+
+	# Plot expert indexes
 	for each_expert in expert_ensemble.experts:
 		expert_index = each_expert.get_index()
 		expert_tags  = each_expert.get_tags()
@@ -174,5 +189,7 @@ if __name__ == "__main__":
 		)
 
 		plt.annotate(f"{expert_tags}", (expert_index[0], expert_index[1]))
-		
+	
+	plt.xlabel("X") 
+	plt.ylabel("Y") 		
 	plt.show()

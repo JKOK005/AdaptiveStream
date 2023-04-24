@@ -80,6 +80,8 @@ class ExpertEnsemble(object):
 		return
 
 	def infer(self, input_data):
+		# TODO: Evaluate on fall back expert logic
+
 		all_experts = [self.fallback_expert] + self.experts
 		scores 		= [each_expert.score(input_data) for each_expert in all_experts]
 		best_indx   = scores.index(min(scores))

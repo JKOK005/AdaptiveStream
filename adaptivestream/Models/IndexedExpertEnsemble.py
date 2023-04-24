@@ -159,5 +159,19 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		return
 
 	def infer(self, input_data):
-		# TODO: Consult K means index tree for expert selection
-		pass
+		# TODO: Evaluate on fall back expert logic
+
+		def leaf_selection(root: IndexedTreeNode) -> IndexedTreeNode:
+			if root.check_leaf():
+				return root
+
+			children_nodes 		= root.get_children()
+			children_exemplars 	= [each_node.get_exemplar() for each_node in children_nodes]
+			scores  			= np.array([each_exemplar.score(input_X = input_data) for each_exemplar in children_exemplars])
+			best_children  		= scores.argmin()
+			return leaf_selection(root = children_nodes[best_children])
+		
+		leaf_node 		= leaf_selection(root = self.indexed_tree)
+		leaf_experts 	= leaf_node.get_experts()
+		preds 			= [each_expert.infer(input_data) for each_expert in leaf_experts]
+		return tf.math.reduce_mean(preds, axis = 0)
