@@ -6,6 +6,7 @@ from alibi_detect.models.tensorflow.losses import elbo
 from matplotlib import pyplot as plt
 from tensorflow.keras import layers, losses, optimizers, Sequential
 from Buffer import LabelledFeatureBuffer
+from Examples.Math.index_tree_creation import *
 from Models import IndexedExpertEnsemble, IndexTreeBuilder
 from Models.Router import OutlierVAERouter
 from Models.Wrapper import SupervisedModelWrapper
@@ -65,10 +66,10 @@ def build_router(input_size):
 				},
 
 				training_params = {
-					"epochs" 		: 20,
+					"epochs" 		: 60,
 					"batch_size" 	: 64,
 					"loss_fn" 		: elbo,
-					"optimizer" 	: optimizers.Adam(learning_rate=5e-3),
+					"optimizer" 	: optimizers.Adam(learning_rate=1e-3),
 				},
 
 				inference_params = {
@@ -103,8 +104,8 @@ if __name__ == "__main__":
 						)
 
 	tree_builder 	= IndexTreeBuilder(
-						leaf_expert_count = 3, 
-						k_clusters = 4
+						leaf_expert_count = 2, 
+						k_clusters = 2
 					)
 
 	expert_ensemble = IndexedExpertEnsemble(
@@ -193,3 +194,5 @@ if __name__ == "__main__":
 	plt.xlabel("X") 
 	plt.ylabel("Y") 		
 	plt.show()
+
+	visualize_cls_separation(root = expert_ensemble.indexed_tree, max_depth = 1)

@@ -7,7 +7,7 @@ def experts_at_depth(root, all_experts,
 					 max_depth, cur_depth 
 				 ):
 	if root.check_leaf() or cur_depth == max_depth:
-		all_experts.append(root.get_experts())
+		all_experts.append((root.get_experts(), root.get_exemplar()))
 		return
 
 	else:
@@ -33,9 +33,14 @@ def visualize_cls_separation(root, max_depth):
 	plt.xlabel("X") 
 	plt.ylabel("Y")
 
-	for indx, each_experts in enumerate(experts_at_max_depth):
+	for indx, (each_experts, each_exemplar) in enumerate(experts_at_max_depth):
 		cluster_indexes = [e.get_index() for e in each_experts]
-		plt.scatter(*zip(*cluster_indexes), marker = "o", c = colors[indx])
+		exemplar_index  = each_exemplar.get_index()
+		exemplar_tag    = each_exemplar.get_tags()
+		
+		plt.scatter(*zip(*cluster_indexes), marker = "o", s = 10, c = colors[indx])
+		plt.scatter(exemplar_index[0], exemplar_index[1], marker = "x", s = 100, c = colors[indx])
+		plt.annotate(f"{exemplar_tag}", (exemplar_index[0], exemplar_index[1]))
 
 	plt.show()
 	return
