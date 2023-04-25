@@ -80,19 +80,16 @@ if __name__ == "__main__":
 
 	# Define scaling rules
 	scaling_rules 	= 	[
-							# OnlineMMDDrift(
-							# 	min_trigger_count 	= 2048,
-							# 	safety_timestep 	= 50,
-							# 	init_params 		= {
-							# 		"ert" 			: 500,
-							# 		"window_size" 	: 20,
-							# 		"n_bootstraps" 	: 1500,
-							# 	}
-							# ),
-
-							# BufferSizeLimit(min_size = 4096)
-
-							BufferSizeLimit(min_size = 256)
+							OnlineMMDDrift(
+								min_trigger_count 	= 2048,
+								safety_timestep 	= 50,
+								init_params 		= {
+									"ert" 			: 500,
+									"window_size" 	: 20,
+									"n_bootstraps" 	: 1500,
+								}
+							),
+							BufferSizeLimit(min_size = 4096)
 						]
 
 	# Define scaling policy
