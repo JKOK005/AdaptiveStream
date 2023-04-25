@@ -3,17 +3,19 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from alibi_detect.models.tensorflow.losses import elbo
+from matplotlib import pyplot as plt
+from tensorflow.keras import layers, losses, optimizers, Sequential
 from Buffer import LabelledFeatureBuffer
-from Models import ExpertEnsemble
+from Examples.Math.index_tree_creation import *
+from Models import IndexedExpertEnsemble, IndexTreeBuilder
 from Models.Router import OutlierVAERouter
 from Models.Wrapper import SupervisedModelWrapper
 from Rules.Scaling import BufferSizeLimit, OnlineMMDDrift
 from Policies.Compaction import NoCompaction
 from Policies.Scaling import NaiveScaling, NaiveKnowledgeTransfer
-from tensorflow.keras import layers, losses, optimizers, Sequential
 
 """
-We demonstrate an instance of scaling our mixture of expert ensemble 
+We demonstrate an instance of scaling our mixture of expert ensemble with indexing
 
 In this example, we will load data into our buffer in batches
 We will define a scaling rule which requests the training and provision of a new expert after exceeding a buffer threshold size
@@ -64,10 +66,10 @@ def build_router(input_size):
 				},
 
 				training_params = {
-					"epochs" 		: 20,
+					"epochs" 		: 60,
 					"batch_size" 	: 64,
 					"loss_fn" 		: elbo,
-					"optimizer" 	: optimizers.Adam(learning_rate=5e-3),
+					"optimizer" 	: optimizers.Adam(learning_rate=1e-3),
 				},
 
 				inference_params = {
@@ -80,17 +82,8 @@ if __name__ == "__main__":
 
 	# Define scaling rules
 	scaling_rules 	= 	[
-							OnlineMMDDrift(
-								min_trigger_count 	= 2048,
-								safety_timestep 	= 50,
-								init_params 		= {
-									"ert" 			: 500,
-									"window_size" 	: 20,
-									"n_bootstraps" 	: 1500,
-								}
-							),
-							BufferSizeLimit(min_size = 4096)
-						]
+							BufferSizeLimit(min_size = 256)
+						]	
 
 	# Define scaling policy
 	model_wrapper 	= 	SupervisedModelWrapper(
@@ -110,13 +103,20 @@ if __name__ == "__main__":
 							router 	= model_router
 						)
 
-	expert_ensemble = ExpertEnsemble(
+	tree_builder 	= IndexTreeBuilder(
+						leaf_expert_count = 2, 
+						k_clusters = 2
+					)
+
+	expert_ensemble = IndexedExpertEnsemble(
+						tree_builder 		= tree_builder,
+						index_dim 			= 2,
 						buffer 				= LabelledFeatureBuffer(),
 						scaling_rules 		= scaling_rules,
 						scaling_policy 		= scaling_policy, 
 						compaction_rules 	= [],
 						compaction_policy 	= NoCompaction(),
-					)
+					)	
 
 	# Mix red & white wine datasets together, with white = 1 & red = 0
 	red = pd.read_csv(
@@ -159,8 +159,6 @@ if __name__ == "__main__":
 		ingested_counts += len(batch_feats)
 		logging.info(f"Total data ingested: {ingested_counts}")
 
-	expert_ensemble.scale_experts()
-
 	# Infer on test data
 	preds 	= None
 	labels 	= None
@@ -177,3 +175,24 @@ if __name__ == "__main__":
 			    num_classes = 2,
 			)
 	print(mat)
+
+	# Plot expert indexes
+	for each_expert in expert_ensemble.experts:
+		expert_index = each_expert.get_index()
+		expert_tags  = each_expert.get_tags()
+
+		plt.plot(
+			expert_index[0], 
+			expert_index[1], 
+			marker = "o", 
+			markersize = 10, 
+			markeredgecolor = "red"
+		)
+
+		plt.annotate(f"{expert_tags}", (expert_index[0], expert_index[1]))
+	
+	plt.xlabel("X") 
+	plt.ylabel("Y") 		
+	plt.show()
+
+	visualize_cls_separation(root = expert_ensemble.indexed_tree, max_depth = 1)

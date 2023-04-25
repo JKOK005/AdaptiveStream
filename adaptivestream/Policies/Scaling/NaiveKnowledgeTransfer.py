@@ -1,4 +1,5 @@
 import copy
+import itertools
 from Models.Expert import Expert
 from Models.Router.Router import Router
 from Models.Wrapper.ModelWrapper import ModelWrapper
@@ -6,6 +7,7 @@ from Policies.Scaling.ScalingPolicy import ScalingPolicy
 
 class NaiveKnowledgeTransfer(ScalingPolicy):
 	prior_expert = None
+	counter  	 = itertools.count()
 
 	def __init__(self, 	model: ModelWrapper, 
 						router: Router,
@@ -17,7 +19,6 @@ class NaiveKnowledgeTransfer(ScalingPolicy):
 	def train_expert(self, *args, **kwargs):
 		expert_model 		= 	copy.deepcopy(self.model_template) if self.prior_expert is None \
 								else copy.deepcopy(self.prior_expert)
-
 		expert_model.train(buffer = self.buffer)
 		self.prior_expert 	= expert_model
 
@@ -25,6 +26,8 @@ class NaiveKnowledgeTransfer(ScalingPolicy):
 		expert_router.train(buffer = self.buffer)
 
 		trained_expert 	= Expert(trained_model = expert_model, router = expert_router)
+		
+		trained_expert.set_tags(tags = {"num" : next(self.counter)})
 		return trained_expert
 
 	def reset(self, *args, **kwargs):

@@ -1,3 +1,4 @@
+from Models import Expert
 from Rules.Compaction.CompactionRules import CompactionRules
 
 class SizeRules(CompactionRules):
@@ -5,7 +6,7 @@ class SizeRules(CompactionRules):
         self.N = N
         self.K = K
 
-    def check_compaction(self, experts, *args, **kwargs):
+    def check_compaction(self, experts: [Expert], *args, **kwargs):
         if len(experts) < self.N + self.K:
             return False
         else:

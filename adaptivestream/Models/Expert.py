@@ -1,9 +1,12 @@
+import numpy as np
+from typing import Any, Dict
 from Models.Router.Router import Router
 from Models.Wrapper.ModelWrapper import ModelWrapper
 
 class Expert(object):
 	trained_model 	= None
 	router 			= None
+	tags 			= None
 
 	def __init__(self, 	trained_model: ModelWrapper, 
 						router: Router,
@@ -11,6 +14,7 @@ class Expert(object):
 				):
 		self.trained_model 	= trained_model
 		self.router 		= router
+		self.index  		= None
 		return
 
 	def permit_entry(self, input_X, *args, **kwargs):
@@ -34,3 +38,15 @@ class Expert(object):
 	
 	def loss(self, input_X, input_y, *args, **kwargs):
 		return self.trained_model.loss(input_X = input_X, input_y = input_y)
+
+	def get_index(self):
+		return self.index
+
+	def get_tags(self):
+		return self.tags
+
+	def set_index(self, new_index: np.ndarray):
+		self.index = new_index
+
+	def set_tags(self, tags: Dict[str, Any]):
+		self.tags = tags

@@ -1,4 +1,5 @@
 import copy
+import time
 from Models.Expert import Expert
 from Models.Router.Router import Router
 from Models.Wrapper.ModelWrapper import ModelWrapper
@@ -20,6 +21,7 @@ class NaiveScaling(ScalingPolicy):
 		expert_router.train(buffer = self.buffer)
 
 		trained_expert 	= Expert(trained_model = expert_model, router = expert_router)
+		trained_expert.set_tags(tags = {"created_at" : time.time()})
 		return trained_expert
 
 	def reset(self, *args, **kwargs):
