@@ -7,7 +7,7 @@ def experts_at_depth(root, all_experts,
 					 max_depth, cur_depth 
 				 ):
 	if root.check_leaf() or cur_depth == max_depth:
-		all_experts.append((root.get_experts(), root.get_exemplar()))
+		all_experts.append((root.get_experts(), root.get_exemplars()))
 		return
 
 	else:
@@ -33,14 +33,17 @@ def visualize_cls_separation(root, max_depth):
 	plt.xlabel("X") 
 	plt.ylabel("Y")
 
-	for indx, (each_experts, each_exemplar) in enumerate(experts_at_max_depth):
-		cluster_indexes = [e.get_index() for e in each_experts]
-		exemplar_index  = each_exemplar.get_index()
-		exemplar_tag    = each_exemplar.get_tags()
-		
+	for indx, (each_experts, each_exemplars) in enumerate(experts_at_max_depth):
+		cluster_indexes 	= [e.get_index() for e in each_experts]
+		exemplar_indexes  	= [e.get_index() for e in each_exemplars]
+
 		plt.scatter(*zip(*cluster_indexes), marker = "o", s = 10, c = colors[indx])
-		plt.scatter(exemplar_index[0], exemplar_index[1], marker = "x", s = 100, c = colors[indx])
-		plt.annotate(f"{exemplar_tag}", (exemplar_index[0], exemplar_index[1]))
+		plt.scatter(*zip(*exemplar_indexes), marker = "x", s = 100, c = colors[indx])
+
+		for each_exemplar in each_exemplars:
+			exemplar_tag    = each_exemplar.get_tags()
+			exemplar_index  = each_exemplar.get_index()
+			plt.annotate(f"{exemplar_tag}", (exemplar_index[0], exemplar_index[1]))
 
 	plt.show()
 	return
@@ -54,7 +57,9 @@ We construct the indexed tree and plot a visual of how all experts at max_depth 
 
 if __name__ == "__main__":
 	index_tree_builder 	= IndexTreeBuilder(	leaf_expert_count = 10, 
-											k_clusters = 6)
+											k_clusters = 6,
+											exemplar_count = 3
+										)
 
 	num_experts  	= 1000
 	expert_index 	= np.random.uniform(low = 0, high = 1, size = (num_experts, 2)) 	# k x n, k being the number of experts and n the index dim
