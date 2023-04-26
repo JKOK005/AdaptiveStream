@@ -105,7 +105,8 @@ if __name__ == "__main__":
 
 	tree_builder 	= IndexTreeBuilder(
 						leaf_expert_count = 2, 
-						k_clusters = 2
+						k_clusters = 2,
+						exemplar_count = 3,
 					)
 
 	expert_ensemble = IndexedExpertEnsemble(

@@ -174,7 +174,14 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 
 			children_nodes 		= root.get_children()
 			children_exemplars 	= [each_node.get_exemplars() for each_node in children_nodes]
-			scores  			= np.array([each_exemplar.score(input_X = input_data) for each_exemplar in children_exemplars])
+			scores  			= np.array(
+									[
+										min([
+												each_exemplar.score(input_X = input_data) for each_exemplar in each_children_exemplar
+										]) 
+										for each_children_exemplar in children_exemplars 
+									]
+								)
 			best_children  		= scores.argmin()
 			return leaf_selection(root = children_nodes[best_children])
 		
