@@ -5,33 +5,35 @@ import numpy as np
 import tensorflow as tf
 
 class IndexedTreeNode(object):
-	exemplar  	= None
 	experts 	= []
+	exemplars  	= []
 	children  	= []
 	is_leaf 	= False
 
 	def __init__(self, 	experts: [Expert], 
-						children: [IndexedTreeNode], 
+						children: [IndexedTreeNode],
+						exemplar_count: int, 
 						is_leaf: bool
 				):
 		self.experts 	= experts
 		self.children 	= children
 		self.is_leaf  	= is_leaf
-		self.exemplar 	= self.compute_exemplar() if len(experts) > 0 else None
+		self.exemplars 	= self.compute_exemplars(max_count = exemplar_count) if len(experts) > 0 else None
 
-	def compute_exemplar(self):
-		if len(self.experts) == 1:
-			exemplar_indx = 0 
+	def compute_exemplars(self, max_count: int):
+		if len(self.experts) <= max_count:
+			exemplars  		= self.experts
 		else:
 			expert_indexes 	= np.vstack([each_expert.get_index() for each_expert in self.experts])
-			exemplar_indx  	= ClusterTools.exemplar_selection(indexes = expert_indexes)
-		return self.experts[exemplar_indx]
+			exemplar_indx  	= ClusterTools.exemplar_selection(indexes = expert_indexes, exemplar_count = max_count)
+			exemplars  		= [self.experts[i] for i in exemplar_indx]
+		return exemplars
 	
 	def get_experts(self) -> [Expert]:
 		return self.experts
 
-	def get_exemplar(self) -> Expert:
-		return self.exemplar
+	def get_exemplars(self) -> [Expert]:
+		return self.exemplars
 
 	def get_children(self) -> [IndexedTreeNode]:
 		return self.children
@@ -42,22 +44,26 @@ class IndexedTreeNode(object):
 class IndexTreeBuilder(object):
 	def __init__(self, 	leaf_expert_count: int, 
 						k_clusters: int, 
+						exemplar_count: int, 
 						*args, **kwargs
 				):
 		"""
 		params: leaf_expert_count 	: controls the number of experts per index tree node
 		params: k_clusters 			: number of clusters to split the indexed tree
+		params: exemplar_count 		: K exemplars used to represent the cluster
 		"""
 		self.leaf_expert_count 	= leaf_expert_count
 		self.k_clusters 		= k_clusters
+		self.exemplar_count 	= exemplar_count
 		return
 
 	def build_index_tree(self, experts: [Expert]) -> IndexedTreeNode:
 		if len(experts) <= self.leaf_expert_count:
 			return 	IndexedTreeNode(
-						experts 	= experts,
-						children 	= [],
-						is_leaf  	= True
+						exemplar_count 	= self.exemplar_count,
+						experts 		= experts,
+						children 		= [],
+						is_leaf  		= True
 					)
 
 		expert_indexes 	= np.vstack([each_expert.get_index() for each_expert in experts])
@@ -71,9 +77,10 @@ class IndexTreeBuilder(object):
 			children.append(child_node)
 
 		return 	IndexedTreeNode(
-					experts 	= experts,
-					children 	= children,
-					is_leaf  	= False
+					exemplar_count 	= self.exemplar_count,
+					experts 		= experts,
+					children 		= children,
+					is_leaf  		= False
 				)
 
 class IndexedExpertEnsemble(ExpertEnsemble):
@@ -166,7 +173,7 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 				return root
 
 			children_nodes 		= root.get_children()
-			children_exemplars 	= [each_node.get_exemplar() for each_node in children_nodes]
+			children_exemplars 	= [each_node.get_exemplars() for each_node in children_nodes]
 			scores  			= np.array([each_exemplar.score(input_X = input_data) for each_exemplar in children_exemplars])
 			best_children  		= scores.argmin()
 			return leaf_selection(root = children_nodes[best_children])
