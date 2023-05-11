@@ -24,7 +24,6 @@ class XGBoostModelWrapper(ModelWrapper):
 		return
 
 	def infer(	self, input_X: tf.Tensor, 
-					  predict_params: dict,
 					  *args, **kwargs
 			):
-		return self.xg_boost_model.predict(input_X, **predict_params)
+		return self.xg_boost_model.predict(input_X)
