@@ -117,14 +117,11 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 				historical_experts 			= self.experts[:-1]
 				historical_experts_index 	= np.vstack([each_expert.get_index() for each_expert in historical_experts])
 
-				latest_batch_score  = tf.stack([
-										OptimizationTools.loss_dist(
-											expert_set = historical_experts, 
-											input_X = tf.expand_dims(each_data, axis = 0)
-										) for each_data in latest_batch_data
-									], axis = 0)
-				
-				average_score  		= tf.math.reduce_mean(latest_batch_score, axis = 0)
+				average_score  		= OptimizationTools.loss_dist(
+										expert_set = historical_experts, 
+										input_X = latest_batch_data
+									)
+													
 				target_dist  		= tf.nn.softmax(average_score, axis = 0)
 
 				assigned_index 		= OptimizationTools.optimize(

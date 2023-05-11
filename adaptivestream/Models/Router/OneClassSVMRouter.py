@@ -35,4 +35,5 @@ class OneClassSVMRouter(Router):
 					*args, **kwargs
 			) -> float:
 		score = self.classifier.score_samples(input_X)
-		return 1 / (score[0] + 1e-3)
+		normalized_score = 1 / (score + 1e-3)
+		return normalized_score.mean()

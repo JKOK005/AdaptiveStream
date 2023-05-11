@@ -44,4 +44,4 @@ class OutlierVAERouter(Router):
 		self.inference_params["outlier_type"] 			= "instance"
 		self.inference_params["return_instance_score"] 	= True
 		pred = self.classifier.predict(input_X, **self.inference_params)
-		return pred["data"]["instance_score"][0]
+		return pred["data"]["instance_score"].mean()
