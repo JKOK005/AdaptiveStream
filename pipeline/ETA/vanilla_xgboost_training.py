@@ -12,7 +12,7 @@ python3 pipeline/ETA/vanilla_xgboost_training.py \
 
 def build_net():
 	params = {	
-				"n_estimators" : 10000, 'min_child_weight': 1, 'learning_rate': 0.001, 'colsample_bytree': 0.3, 'max_depth': 10,
+				"n_estimators" : 1000, 'min_child_weight': 1, 'learning_rate': 0.01, 'colsample_bytree': 0.3, 'max_depth': 10,
 	            'subsample': 0.9, 'lambda': 0.7, 'nthread': -1, 'booster': 'gbtree', 
 	            'gamma' : 0, 'eval_metric': 'mae', 'objective': 'reg:squarederror', 'seed' : 0, 'verbosity' : 1
             }
@@ -27,7 +27,13 @@ if __name__ == "__main__":
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 	train_df 	= pd.read_csv(args.train_path)
+	train_df  	= train_df[
+					(train_df.request_time >= '2023-01-12') & 
+					(train_df.request_time <= '2023-01-19')
+				]
 	train_df 	= train_df.drop("request_time", axis = 1)
+
+	print(f"Number training: {len(train_df)}")
 
 	feats_as_tensor   = tf.convert_to_tensor(train_df.drop("pred_diff", axis = 1).values, dtype = tf.float32)
 	labels_as_tensor  = tf.convert_to_tensor(train_df["pred_diff"].values, dtype = tf.float32)
@@ -37,6 +43,10 @@ if __name__ == "__main__":
 	model.fit(feats_as_tensor, labels_as_tensor)
 
 	test_df 	= pd.read_csv(args.test_path)
+	test_df  	= test_df[
+					(test_df.request_time >= '2023-01-24') & 
+					(test_df.request_time <= '2023-01-24')
+				]
 	test_df 	= test_df.drop("request_time", axis = 1)
 
 	feats_as_tensor   = tf.convert_to_tensor(test_df.drop("pred_diff", axis = 1).values, dtype = tf.float32)
@@ -47,7 +57,7 @@ if __name__ == "__main__":
 	batch_loss 	= 0
 	batch_count = 0
 
-	for batch_feats, batch_labels in data_gen_testing.batch(100):
+	for batch_feats, batch_labels in data_gen_testing.batch(100000):
 		pred = model.predict(batch_feats)
 		batch_loss 	+= loss_fn(batch_labels, pred)
 		batch_count += 1

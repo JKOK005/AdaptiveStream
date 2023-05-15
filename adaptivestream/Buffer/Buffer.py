@@ -4,7 +4,16 @@ from abc import abstractmethod
 from datetime import datetime
 
 class Buffer(ABC):
+	batch_timestamp_range = [-1, -1]
+
 	def __init__(self, *args, **kwargs):
+		pass
+
+	@abstractmethod
+	def get_batch_timestamps(self, *args, **kwargs):
+		"""
+		Returns range of batch timestamps
+		"""
 		pass
 
 	@abstractmethod
@@ -33,7 +42,10 @@ class Buffer(ABC):
 		pass
 
 	@abstractmethod
-	def add(self, data, *args, **kwargs):
+	def add(self, 	batch_input: (tf.Tensor), 
+					batch_timestamp: int,
+					*args, **kwargs
+			):
 		"""
 		Adds new data to the buffer
 		"""

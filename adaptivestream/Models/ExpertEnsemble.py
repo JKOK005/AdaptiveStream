@@ -58,8 +58,12 @@ class ExpertEnsemble(object):
 			self.fallback_expert = expert
 		return
 
-	def ingest(self, batch_input):
-		self.buffer.add(batch_input = batch_input)
+	def ingest(self, batch_input,
+					 batch_timestamp: int = -1,
+			):
+	
+		self.buffer.add(batch_input = batch_input, 
+						batch_timestamp = batch_timestamp)
 
 		is_compact 	= self._check_to_compact()
 		is_scale  	= self._check_to_scale()
@@ -85,4 +89,5 @@ class ExpertEnsemble(object):
 		all_experts = [self.fallback_expert] + self.experts
 		scores 		= [each_expert.score(input_data) for each_expert in all_experts]
 		best_indx   = scores.index(min(scores))
+		print(scores)
 		return all_experts[best_indx].infer(input_data)

@@ -137,8 +137,12 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 			latest_expert.set_index(new_index = assigned_index)
 		return
 
-	def ingest(self, batch_input):
-		self.buffer.add(batch_input = batch_input)
+	def ingest(self, batch_input,
+					 batch_timestamp: int = -1,
+			):
+	
+		self.buffer.add(batch_input = batch_input,
+						batch_timestamp = batch_timestamp)
 
 		is_compact 	= self._check_to_compact()
 		is_scale  	= self._check_to_scale()
