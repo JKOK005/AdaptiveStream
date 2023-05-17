@@ -32,8 +32,8 @@ def build_router():
 	return	OneClassSVMRouter(
 				init_params = {
 					"kernel" 	: "rbf",
-					"degree" 	: 3,
-					"max_iter" 	: 8000
+					"degree" 	: 4,
+					"max_iter" 	: 5000
 				},
 			)
 
@@ -54,6 +54,7 @@ if __name__ == "__main__":
 	model_wrapper 	= 	XGBoostModelWrapper(
 							xg_boost_model 	= build_net(),
 							training_params = {},
+							loss_fn 		= tf.keras.losses.MeanSquaredError(reduction = tf.keras.losses.Reduction.SUM),
 						)
 
 	# model_router  	= 	build_router(input_size = 8)
@@ -65,7 +66,7 @@ if __name__ == "__main__":
 						)
 
 	tree_builder 	= IndexTreeBuilder(
-						leaf_expert_count = 20, 
+						leaf_expert_count = 3, 
 						k_clusters = 2,
 						exemplar_count = 3,
 					)
@@ -90,12 +91,13 @@ if __name__ == "__main__":
 
 	train_df 	= pd.read_csv(args.train_path)
 	train_df  	= train_df[
-					(train_df.request_time >= '2023-01-01') & 
-					(train_df.request_time <= '2023-01-27')
+					(train_df.request_time >= '2023-01-09') & 
+					(train_df.request_time <= '2023-01-21')
 				]
-
 	train_df["epoch_time"] 	= pd.to_datetime(train_df["request_time"], format = "%Y-%m-%d").map(pd.Timestamp.timestamp)
 	train_df 				= train_df.drop("request_time", axis = 1)
+
+	train_df.loc[train_df.index[-1], 'epoch_time'] = 16842253350
 
 	feats_as_tensor   = tf.convert_to_tensor(train_df.drop("pred_diff", axis = 1).values, dtype = tf.float32)
 	labels_as_tensor  = tf.convert_to_tensor(train_df["pred_diff"].values, dtype = tf.float32)
@@ -104,8 +106,8 @@ if __name__ == "__main__":
 
 	test_df 	= pd.read_csv(args.test_path)
 	test_df  	= test_df[
-					(test_df.request_time >= '2023-01-28') & 
-					(test_df.request_time <= '2023-01-28')
+					(test_df.request_time >= '2023-01-22') & 
+					(test_df.request_time <= '2023-01-22')
 				]
 	test_df 	= test_df.drop("request_time", axis = 1)
 
@@ -129,7 +131,16 @@ if __name__ == "__main__":
 	batch_count = 0
 
 	for batch_feats, batch_labels in data_gen_testing.batch(100000):
-		pred = expert_ensemble.infer(input_data = batch_feats)
+		row_count = batch_feats.shape[0]
+		percentile_smpls = int(row_count * 0.05)
+		
+		feats_smpl 	= batch_feats[:percentile_smpls, :]
+		labels_smpl = batch_labels[:percentile_smpls]
+
+		pred = expert_ensemble.infer_w_smpls(input_data = batch_feats, 
+											 truth_smpls = (feats_smpl, labels_smpl), 
+											 alpha = 0.1)
+
 		batch_loss 	+= loss_fn(batch_labels, pred)
 		batch_count += 1
 

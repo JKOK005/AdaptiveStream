@@ -44,8 +44,8 @@ if __name__ == "__main__":
 
 	test_df 	= pd.read_csv(args.test_path)
 	test_df  	= test_df[
-					(test_df.request_time >= '2023-01-24') & 
-					(test_df.request_time <= '2023-01-24')
+					(test_df.request_time >= '2023-01-20') & 
+					(test_df.request_time <= '2023-01-20')
 				]
 	test_df 	= test_df.drop("request_time", axis = 1)
 

@@ -6,12 +6,14 @@ from xgboost import XGBModel
 
 class XGBoostModelWrapper(ModelWrapper):
 	def __init__(self, 	xg_boost_model: XGBModel,
+						loss_fn: tf.keras.losses,
 						training_params: dict,
 						*args, **kwargs
 				):
 		super(XGBoostModelWrapper, self).__init__()
 		self.xg_boost_model 	= xg_boost_model
 		self.training_params 	= training_params
+		self.loss_fn 			= loss_fn
 		self.logger  			= logging.getLogger("XGBoostModelWrapper")
 		return
 
@@ -27,3 +29,10 @@ class XGBoostModelWrapper(ModelWrapper):
 					  *args, **kwargs
 			):
 		return self.xg_boost_model.predict(input_X)
+
+	def loss(self, 	input_X: tf.Tensor,
+					ground_truth: tf.Tensor,
+					*args, **kwargs
+			) -> tf.Tensor:
+		pred = self.infer(input_X = input_X)
+		return self.loss_fn(ground_truth, pred)

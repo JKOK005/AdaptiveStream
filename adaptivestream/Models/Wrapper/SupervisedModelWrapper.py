@@ -6,12 +6,12 @@ from Models.Wrapper.ModelWrapper import ModelWrapper
 class SupervisedModelWrapper(ModelWrapper):
 	def __init__(self, 	base_model: tf.keras.Model, 
 						optimizer: tf.keras.optimizers, 
-						loss: tf.keras.losses,
+						loss_fn: tf.keras.losses,
 						training_params: dict,
 						*args, **kwargs
 				):
 		super(SupervisedModelWrapper, self).__init__()
-		self.loss 				= loss
+		self.loss_fn 			= loss_fn
 		self.model 				= base_model
 		self.optimizer 			= optimizer
 		self.training_params 	= training_params
@@ -32,3 +32,10 @@ class SupervisedModelWrapper(ModelWrapper):
 				*args, **kwargs
 			):
 		return self.model(input_X)
+
+	def loss(self, 	input_X: tf.Tensor,
+					ground_truth: tf.Tensor,
+					*args, **kwargs
+			) -> tf.Tensor:
+		pred = self.infer(input_X = input_X)
+		return self.loss_fn(ground_truth, pred)

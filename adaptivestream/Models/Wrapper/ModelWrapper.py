@@ -25,3 +25,12 @@ class ModelWrapper(ABC):
 		The end result should be a return value representing model inference on the input data. 
 		""" 
 		pass
+
+	def loss(self, 	input_X, 
+					ground_truth, 
+					*args, **kwargs
+			):
+		"""
+		Scores the prediction of a model over the given ground truth.
+		"""
+		pass
