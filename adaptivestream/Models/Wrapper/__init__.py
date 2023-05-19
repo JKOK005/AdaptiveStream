@@ -1,1 +1,2 @@
 from Models.Wrapper.SupervisedModelWrapper import SupervisedModelWrapper
+from Models.Wrapper.XGBoostModelWrapper import XGBoostModelWrapper

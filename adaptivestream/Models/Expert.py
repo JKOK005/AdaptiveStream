@@ -37,7 +37,7 @@ class Expert(object):
 		return self.trained_model.evaluate(input_X = input_X, input_y = input_y)
 	
 	def loss(self, input_X, input_y, *args, **kwargs):
-		return self.trained_model.loss(input_X = input_X, input_y = input_y)
+		return self.trained_model.loss(input_X = input_X, ground_truth = input_y)
 
 	def get_index(self):
 		return self.index

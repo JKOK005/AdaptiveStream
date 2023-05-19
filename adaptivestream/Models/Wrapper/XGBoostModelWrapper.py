@@ -1,21 +1,20 @@
-import tensorflow as tf
 import logging
+import tensorflow as tf
 from Buffer.Buffer import Buffer
 from Models.Wrapper.ModelWrapper import ModelWrapper
+from xgboost import XGBModel
 
-class SupervisedModelWrapper(ModelWrapper):
-	def __init__(self, 	base_model: tf.keras.Model, 
-						optimizer: tf.keras.optimizers, 
+class XGBoostModelWrapper(ModelWrapper):
+	def __init__(self, 	xg_boost_model: XGBModel,
 						loss_fn: tf.keras.losses,
 						training_params: dict,
 						*args, **kwargs
 				):
-		super(SupervisedModelWrapper, self).__init__()
-		self.loss_fn 			= loss_fn
-		self.model 				= base_model
-		self.optimizer 			= optimizer
+		super(XGBoostModelWrapper, self).__init__()
+		self.xg_boost_model 	= xg_boost_model
 		self.training_params 	= training_params
-		self.logger  			= logging.getLogger("SupervisedModelWrapper")
+		self.loss_fn 			= loss_fn
+		self.logger  			= logging.getLogger("XGBoostModelWrapper")
 		return
 
 	def train(	self, buffer: Buffer, 
@@ -23,15 +22,13 @@ class SupervisedModelWrapper(ModelWrapper):
 			):
 		buffer_feat 	= buffer.get_data()
 		buffer_label 	= buffer.get_label()
-
-		self.model.compile(optimizer = self.optimizer, loss = self.loss)
-		self.model.fit(buffer_feat, buffer_label, **self.training_params)
+		self.xg_boost_model.fit(buffer_feat, buffer_label, **self.training_params)
 		return
 
 	def infer(	self, input_X: tf.Tensor, 
-				*args, **kwargs
+					  *args, **kwargs
 			):
-		return self.model(input_X)
+		return self.xg_boost_model.predict(input_X)
 
 	def loss(self, 	input_X: tf.Tensor,
 					ground_truth: tf.Tensor,
