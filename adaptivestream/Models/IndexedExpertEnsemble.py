@@ -190,3 +190,55 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		leaf_experts 	= leaf_node.get_experts()
 		preds 			= [each_expert.infer(input_data) for each_expert in leaf_experts]
 		return tf.math.reduce_mean(preds, axis = 0)
+
+	def infer_w_smpls(self, input_data,
+							truth_smpls,
+							alpha = 0.1,
+					):
+
+		def leaf_selection(root: IndexedTreeNode) -> IndexedTreeNode:
+			if root.check_leaf():
+				return root
+
+			children_nodes 		= root.get_children()
+			children_exemplars 	= [each_node.get_exemplars() for each_node in children_nodes]
+			(truth_feats, truth_labels) = truth_smpls
+
+			parent_clusters 	= np.concatenate(
+									[
+										[
+											indx for _ in each_children_exemplar
+										] for indx, each_children_exemplar in enumerate(children_exemplars)
+									]
+								)
+
+			scores  			= np.concatenate(
+									[
+										[
+											each_exemplar.score(input_X = input_data) for each_exemplar in each_children_exemplar
+										]
+										for each_children_exemplar in children_exemplars 
+									]
+								)
+			scores_sm  			= tf.math.softmax(tf.math.log(scores))
+			scores_sm 			= tf.cast(scores_sm, tf.float32)
+
+			loss 				= np.concatenate(
+									[
+										[
+											each_exemplar.loss(input_X = truth_feats, input_y = truth_labels) for each_exemplar in each_children_exemplar
+										]
+										for each_children_exemplar in children_exemplars 
+									]
+								)
+			loss_sm  			= tf.math.softmax(tf.math.log(loss))
+			loss_sm 			= tf.cast(loss_sm, tf.float32)
+
+			agg_score  			= alpha * scores_sm + (1 - alpha) * loss_sm
+			best_indx   		= int(tf.argmin(agg_score))
+			return leaf_selection(root = children_nodes[parent_clusters[best_indx]])
+
+		leaf_node 		= leaf_selection(root = self.indexed_tree)
+		leaf_experts 	= leaf_node.get_experts()
+		preds 			= [each_expert.infer(input_data) for each_expert in leaf_experts]
+		return tf.math.reduce_mean(preds, axis = 0)

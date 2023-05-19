@@ -71,28 +71,28 @@ if __name__ == "__main__":
 						exemplar_count = 3,
 					)
 
-	# expert_ensemble = IndexedExpertEnsemble(
-	# 					tree_builder 		= tree_builder,
-	# 					index_dim 			= 3,
-	# 					buffer 				= LabelledFeatureBuffer(),
-	# 					scaling_rules 		= scaling_rules,
-	# 					scaling_policy 		= scaling_policy, 
-	# 					compaction_rules 	= [],
-	# 					compaction_policy 	= NoCompaction(),
-	# 				)	
-
-	expert_ensemble = ExpertEnsemble(
+	expert_ensemble = IndexedExpertEnsemble(
+						tree_builder 		= tree_builder,
+						index_dim 			= 3,
 						buffer 				= LabelledFeatureBuffer(),
 						scaling_rules 		= scaling_rules,
 						scaling_policy 		= scaling_policy, 
 						compaction_rules 	= [],
 						compaction_policy 	= NoCompaction(),
-					)
+					)	
+
+	# expert_ensemble = ExpertEnsemble(
+	# 					buffer 				= LabelledFeatureBuffer(),
+	# 					scaling_rules 		= scaling_rules,
+	# 					scaling_policy 		= scaling_policy, 
+	# 					compaction_rules 	= [],
+	# 					compaction_policy 	= NoCompaction(),
+	# 				)
 
 	train_df 	= pd.read_csv(args.train_path)
 	train_df  	= train_df[
-					(train_df.request_time >= '2023-01-09') & 
-					(train_df.request_time <= '2023-01-21')
+					(train_df.request_time >= '2023-01-15') & 
+					(train_df.request_time <= '2023-01-27')
 				]
 	train_df["epoch_time"] 	= pd.to_datetime(train_df["request_time"], format = "%Y-%m-%d").map(pd.Timestamp.timestamp)
 	train_df 				= train_df.drop("request_time", axis = 1)
@@ -106,8 +106,8 @@ if __name__ == "__main__":
 
 	test_df 	= pd.read_csv(args.test_path)
 	test_df  	= test_df[
-					(test_df.request_time >= '2023-01-22') & 
-					(test_df.request_time <= '2023-01-22')
+					(test_df.request_time >= '2023-01-28') & 
+					(test_df.request_time <= '2023-01-28')
 				]
 	test_df 	= test_df.drop("request_time", axis = 1)
 
@@ -145,6 +145,3 @@ if __name__ == "__main__":
 		batch_count += 1
 
 	logging.info(f"Average batch loss: {batch_loss / batch_count}")
-
-	import IPython
-	IPython.embed()
