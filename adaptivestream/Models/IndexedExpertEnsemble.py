@@ -164,6 +164,9 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		if is_compact or is_scale:
 			# Rebuild K means index tree
 			self.indexed_tree 	= self.tree_builder.build_index_tree(experts = self.experts)
+
+		if self._check_to_checkpoint():
+			self.checkpoint_policy.save(expert_emsemble = self, log_state = True)
 		return
 
 	def infer(self, input_data):

@@ -8,7 +8,9 @@ from adaptivestream.Models.Router import OutlierVAERouter, OneClassSVMRouter
 from adaptivestream.Models.Wrapper import XGBoostModelWrapper
 from adaptivestream.Policies.Compaction import NoCompaction
 from adaptivestream.Policies.Scaling import NaiveScaling
+from adaptivestream.Policies.Checkpoint import DirectoryCheckpoint
 from adaptivestream.Rules.Scaling import BufferSizeLimit, TimeLimit
+from adaptivestream.Rules.Checkpoint import SaveOnStateChange
 from alibi_detect.models.tensorflow.losses import elbo
 from matplotlib import pyplot as plt
 from xgboost import XGBRegressor
@@ -17,7 +19,8 @@ from Examples.Math.index_tree_creation import *
 """
 python3 pipeline/ETA/eta_sg_training.py \
 --train_path data/smpl_train_sg.csv \
---test_path data/smpl_train_sg.csv
+--test_path data/smpl_train_sg.csv \
+--save_path checkpoint
 """
 
 def build_net():
@@ -41,6 +44,7 @@ if __name__ == "__main__":
 	parser 		= argparse.ArgumentParser(description='SG ETA training of XG Boost models')
 	parser.add_argument('--train_path', type = str, nargs = '?', help = 'Path to train features')
 	parser.add_argument('--test_path', type = str, nargs = '?', help = 'Path to test features')
+	parser.add_argument('--save_path', type = str, nargs = '?', help = 'Model checkpoint path')
 	args 		= parser.parse_args()
 
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -48,14 +52,19 @@ if __name__ == "__main__":
 	# Define scaling rules
 	scaling_rules 	= 	[
 							TimeLimit(interval_sec = 24 * 60 * 60)
-						]	
-
-	# Define scaling policy
+						]
 	model_wrapper 	= 	XGBoostModelWrapper(
 							xg_boost_model 	= build_net(),
 							training_params = {},
 							loss_fn 		= tf.keras.losses.MeanSquaredError(reduction = tf.keras.losses.Reduction.SUM),
 						)
+
+	# Define checkpoint rules and policies
+	checkpoint_rules = 	[
+							SaveOnStateChange()
+						]
+
+	checkpoint_policy = DirectoryCheckpoint(save_path = args.save_path)
 
 	# model_router  	= 	build_router(input_size = 8)
 	model_router  	= 	build_router()
@@ -71,23 +80,27 @@ if __name__ == "__main__":
 						exemplar_count = 3,
 					)
 
-	expert_ensemble = IndexedExpertEnsemble(
-						tree_builder 		= tree_builder,
-						index_dim 			= 3,
-						buffer 				= LabelledFeatureBuffer(),
-						scaling_rules 		= scaling_rules,
-						scaling_policy 		= scaling_policy, 
-						compaction_rules 	= [],
-						compaction_policy 	= NoCompaction(),
-					)	
-
-	# expert_ensemble = ExpertEnsemble(
+	# expert_ensemble = IndexedExpertEnsemble(
+	# 					tree_builder 		= tree_builder,
+	# 					index_dim 			= 3,
 	# 					buffer 				= LabelledFeatureBuffer(),
 	# 					scaling_rules 		= scaling_rules,
 	# 					scaling_policy 		= scaling_policy, 
 	# 					compaction_rules 	= [],
 	# 					compaction_policy 	= NoCompaction(),
-	# 				)
+	# 					checkpoint_rules 	= checkpoint_rules,
+	# 					checkpoint_policy 	= checkpoint_policy
+	# 				)	
+
+	expert_ensemble = ExpertEnsemble(
+						buffer 				= LabelledFeatureBuffer(),
+						scaling_rules 		= scaling_rules,
+						scaling_policy 		= scaling_policy, 
+						compaction_rules 	= [],
+						compaction_policy 	= NoCompaction(),
+						checkpoint_rules 	= checkpoint_rules,
+						checkpoint_policy 	= checkpoint_policy
+					)
 
 	train_df 	= pd.read_csv(args.train_path)
 	train_df  	= train_df[
