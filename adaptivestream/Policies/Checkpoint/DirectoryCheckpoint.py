@@ -25,7 +25,7 @@ class DirectoryCheckpoint(CheckpointPolicy):
 		
 		current_time_round_up 	= int(time.time())
 		model_save_path 		= os.path.join(self.save_path, str(current_time_round_up))
-		model_save_file  		= os.path.join(model_save_path, "model.pickle")
+		model_save_file  		= os.path.join(model_save_path, "model.pkl")
 
 		Path(model_save_path).mkdir(parents = False, exist_ok = False)
 

@@ -2,10 +2,6 @@ import tensorflow as tf
 import uuid
 
 class ExpertEnsemble(object):
-	experts 			= []
-	fallback_expert 	= None
-
-	scaling_rules 		= None
 	compaction_rules 	= None
 	checkpoint_rules 	= None
 	
@@ -28,6 +24,8 @@ class ExpertEnsemble(object):
 		"""
 		Policy returns a single trained (router, model) pair
 		"""
+		self.experts 			= []
+		self.fallback_expert 	= None
 		self.scaling_rules 		= scaling_rules
 		self.scaling_policy 	= scaling_policy
 		self.compaction_rules 	= compaction_rules
