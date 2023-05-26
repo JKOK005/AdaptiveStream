@@ -1,26 +1,37 @@
 import tensorflow as tf
+import uuid
 
 class ExpertEnsemble(object):
-	experts 			= []
-	fallback_expert 	= None
+	compaction_rules 	= None
+	checkpoint_rules 	= None
+	
 	scaling_policy 		= None 
 	compaction_policy 	= None
+	checkpoint_policy 	= None
+	
 	buffer 				= None
+	state  				= {"id" : uuid.uuid4().hex, "range" : None}
 
 	def __init__(self, 	scaling_rules,
 						scaling_policy, 
 						compaction_rules,
 						compaction_policy,
 						buffer,
+						checkpoint_rules 	= [],
+						checkpoint_policy 	= None,
 						*args, **kwargs
 				):
 		"""
 		Policy returns a single trained (router, model) pair
 		"""
+		self.experts 			= []
+		self.fallback_expert 	= None
 		self.scaling_rules 		= scaling_rules
 		self.scaling_policy 	= scaling_policy
 		self.compaction_rules 	= compaction_rules
 		self.compaction_policy 	= compaction_policy
+		self.checkpoint_rules 	= checkpoint_rules
+		self.checkpoint_policy  = checkpoint_policy
 		self.buffer 			= buffer
 
 		self.scaling_policy.set_buffer(buffer = buffer)
@@ -39,6 +50,7 @@ class ExpertEnsemble(object):
 		for each_rule in self.scaling_rules:
 			each_rule.reset()
 
+		self.state = {"id" : uuid.uuid4().hex, "range" : self.buffer.get_batch_timestamps()}
 		self.scaling_policy.reset()
 		self.buffer.clear()
 		return
@@ -51,6 +63,18 @@ class ExpertEnsemble(object):
 				return rule.check_compact(experts = self.experts)
 		decisions 	= [check(rule = each_rule) for each_rule in self.compaction_rules]
 		return any(decisions)
+
+	def _check_to_checkpoint(self):
+		def check(rule):
+			if type(rule) == tuple:
+				return all([check(rule = each_rule) for each_rule in rule])
+			else:
+				return rule.check_checkpoint(expert_ensemble = self)
+		decisions 	= [check(rule = each_rule) for each_rule in self.checkpoint_rules]
+		return any(decisions)
+
+	def get_state(self):
+		return self.state
 
 	def scale_experts(self):
 		expert = self.scaling_policy.train_expert()
@@ -82,7 +106,9 @@ class ExpertEnsemble(object):
 		if is_scale:
 			self.scale_experts()
 			self._reset_scale()
-			
+
+		if self._check_to_checkpoint():
+			self.checkpoint_policy.save(expert_emsemble = self, log_state = True)
 		return
 
 	def infer(self, input_data):
