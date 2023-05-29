@@ -1,23 +1,22 @@
 import logging
 import tensorflow as tf
 from Buffer.LabelledFeatureBuffer import LabelledFeatureBuffer
-from Models.Router import OneClassSVMRouter
+from Models.Router import IsolationForestRouter
 from sklearn.datasets import load_diabetes
 
 """
-We show how to train the OneClassSVMRouter router on the diabetes dataset from sklearn
+We show how to train the IsolationForest router on the diabetes dataset from sklearn
 
-Parameters for the OneClassSVMRouter can be found at [1]
+Parameters follow suite sklearn.ensemble.IsolationForest class in Scikit [1]
 
-[1]: https://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html
+[1]: https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html#sklearn.ensemble.IsolationForest.decision_function
 """
 
 def build_router(input_size):
-	return	OneClassSVMRouter(
+	return	IsolationForestRouter(
 				init_params = {
-					"kernel" 	: "rbf",
-					"degree" 	: 4,
-					"max_iter" 	: 10000
+					"n_estimators" 	: 200,
+					"max_samples" 	: "auto"
 				},
 			)
 

@@ -4,7 +4,7 @@ import pandas as pd
 import tensorflow as tf
 from adaptivestream.Buffer import LabelledFeatureBuffer
 from adaptivestream.Models import IndexedExpertEnsemble, IndexTreeBuilder, ExpertEnsemble
-from adaptivestream.Models.Router import OutlierVAERouter, OneClassSVMRouter
+from adaptivestream.Models.Router import IsolationForestRouter, OutlierVAERouter, OneClassSVMRouter
 from adaptivestream.Models.Wrapper import XGBoostModelWrapper
 from adaptivestream.Policies.Compaction import NoCompaction
 from adaptivestream.Policies.Scaling import NaiveScaling
@@ -32,11 +32,10 @@ def build_net():
 	return 	XGBRegressor(**params) 
 
 def build_router():
-	return	OneClassSVMRouter(
+	return	IsolationForestRouter(
 				init_params = {
-					"kernel" 	: "rbf",
-					"degree" 	: 4,
-					"max_iter" 	: 5000
+					"n_estimators" 	: 200,
+					"max_samples" 	: "auto"
 				},
 			)
 
