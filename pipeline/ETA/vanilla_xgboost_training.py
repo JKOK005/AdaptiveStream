@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
 	train_df 	= pd.read_csv(args.train_path)
 	train_df  	= train_df[
-					(train_df.request_time >= '2023-01-19') & 
+					(train_df.request_time >= '2023-01-18') & 
 					(train_df.request_time <= '2023-01-25')
 				]
 	train_df 	= train_df.drop("request_time", axis = 1)
