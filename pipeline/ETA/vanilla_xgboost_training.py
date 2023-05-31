@@ -62,4 +62,5 @@ if __name__ == "__main__":
 		batch_loss 	+= loss_fn(batch_labels, pred)
 		batch_count += 1
 
+	logging.info(f"Test count: {len(test_df)}")
 	logging.info(f"Average batch loss: {batch_loss / batch_count}")
