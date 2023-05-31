@@ -28,8 +28,8 @@ if __name__ == "__main__":
 
 	train_df 	= pd.read_csv(args.train_path)
 	train_df  	= train_df[
-					(train_df.request_time >= '2023-01-18') & 
-					(train_df.request_time <= '2023-01-25')
+					(train_df.request_time >= '2023-01-14') & 
+					(train_df.request_time <= '2023-01-21')
 				]
 	train_df 	= train_df.drop("request_time", axis = 1)
 
@@ -44,8 +44,8 @@ if __name__ == "__main__":
 
 	test_df 	= pd.read_csv(args.test_path)
 	test_df  	= test_df[
-					(test_df.request_time >= '2023-01-26') & 
-					(test_df.request_time <= '2023-01-26')
+					(test_df.request_time >= '2023-01-22') & 
+					(test_df.request_time <= '2023-01-22')
 				]
 	test_df 	= test_df.drop("request_time", axis = 1)
 
