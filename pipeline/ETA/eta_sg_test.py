@@ -31,9 +31,10 @@ if __name__ == "__main__":
 	with open(args.model_path, "rb") as f:
 		expert_ensemble = pickle.load(f)
 
-	loss_fn  	= tf.keras.losses.MeanSquaredError(reduction = tf.keras.losses.Reduction.SUM) 
-	batch_loss 	= 0
-	batch_count = 0
+	loss_fn  			= tf.keras.losses.MeanSquaredError(reduction = tf.keras.losses.Reduction.SUM) 
+	batch_loss 			= 0
+	last_expert_loss 	= 0
+	batch_count 		= 0
 
 	for batch_feats, batch_labels in data_gen_testing.batch(100000):
 		row_count = batch_feats.shape[0]
@@ -46,7 +47,11 @@ if __name__ == "__main__":
 											 truth_smpls = (feats_smpl, labels_smpl), 
 											 alpha = 0.1)
 
-		batch_loss 	+= loss_fn(batch_labels, pred)
-		batch_count += 1
+		last_expert_pred 	= expert_ensemble.experts[-1].infer(input_X = batch_feats)
+
+		batch_loss 			+= loss_fn(batch_labels, pred)
+		last_expert_loss 	+= loss_fn(batch_labels, last_expert_pred)
+		batch_count 		+= 1
 
 	logging.info(f"Average batch loss: {batch_loss / batch_count}")
+	logging.info(f"Last expert loss: {last_expert_loss / batch_count}")
