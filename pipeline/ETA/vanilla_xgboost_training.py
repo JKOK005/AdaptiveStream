@@ -7,7 +7,10 @@ from xgboost import XGBRegressor
 """
 python3 pipeline/ETA/vanilla_xgboost_training.py \
 --train_path data/smpl_train_sg.csv \
---test_path data/smpl_train_sg.csv
+--test_path data/smpl_train_sg.csv \
+--train_date_start '2023-01-14' \
+--train_date_end '2023-01-21' \
+--test_date '2023-01-22'
 """
 
 def build_net():
@@ -22,14 +25,17 @@ if __name__ == "__main__":
 	parser 		= argparse.ArgumentParser(description='SG ETA training of XG Boost models')
 	parser.add_argument('--train_path', type = str, nargs='?', help='Path to train features')
 	parser.add_argument('--test_path', type = str, nargs='?', help='Path to test features')
+	parser.add_argument('--train_date_start', type = str, nargs = '?', help = 'Start date for training')
+	parser.add_argument('--train_date_end', type = str, nargs = '?', help = 'End date for training')
+	parser.add_argument('--test_date', type = str, nargs = '?', help = 'Date filter for evaluating test')
 	args 		= parser.parse_args()
 
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 	train_df 	= pd.read_csv(args.train_path)
 	train_df  	= train_df[
-					(train_df.request_time >= '2023-01-14') & 
-					(train_df.request_time <= '2023-01-21')
+					(train_df.request_time >= args.train_date_start) & 
+					(train_df.request_time <= args.train_date_end)
 				]
 	train_df 	= train_df.drop("request_time", axis = 1)
 
@@ -43,10 +49,7 @@ if __name__ == "__main__":
 	model.fit(feats_as_tensor, labels_as_tensor)
 
 	test_df 	= pd.read_csv(args.test_path)
-	test_df  	= test_df[
-					(test_df.request_time >= '2023-01-22') & 
-					(test_df.request_time <= '2023-01-22')
-				]
+	test_df  	= test_df[test_df.request_time == args.test_date]
 	test_df 	= test_df.drop("request_time", axis = 1)
 
 	feats_as_tensor   = tf.convert_to_tensor(test_df.drop("pred_diff", axis = 1).values, dtype = tf.float32)
