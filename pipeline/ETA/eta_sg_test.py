@@ -8,7 +8,9 @@ import tensorflow as tf
 python3 pipeline/ETA/eta_sg_test.py \
 --model_path .pkl \
 --test_path data/smpl_train_sg.csv \
---test_date '2023-01-28'
+--test_date '2023-01-28' \
+--alpha 0.1 \
+--sample_frac 0.05
 """
 
 if __name__ == "__main__":
@@ -16,9 +18,12 @@ if __name__ == "__main__":
 	parser.add_argument('--model_path', type = str, nargs = '?', help = 'Path to train features')
 	parser.add_argument('--test_path', type = str, nargs = '?', help = 'Path to test features')
 	parser.add_argument('--test_date', type = str, nargs = '?', help = 'Date filter for evaluating test')
+	parser.add_argument('--alpha', type = float, nargs = '?', help = 'Weighted ratio of using outlier loss to sample loss')
+	parser.add_argument('--sample_frac', type = float, nargs = '?', help = 'Fraction of test data to sample for computing sample loss')
 	args 	= parser.parse_args()
 
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+	logging.info(f"Using config: {args}")
 
 	test_df  = pd.read_csv(args.test_path)
 	test_df  = test_df[test_df.request_time == args.test_date]

@@ -31,6 +31,7 @@ if __name__ == "__main__":
 	args 		= parser.parse_args()
 
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+	logging.info(f"Using config: {args}")
 
 	train_df 	= pd.read_csv(args.train_path)
 	train_df  	= train_df[

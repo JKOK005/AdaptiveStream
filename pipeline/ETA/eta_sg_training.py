@@ -52,6 +52,7 @@ if __name__ == "__main__":
 	scaling_rules 	= 	[
 							TimeLimit(interval_sec = 24 * 60 * 60)
 						]
+						
 	model_wrapper 	= 	XGBoostModelWrapper(
 							xg_boost_model 	= build_net(),
 							training_params = {},
