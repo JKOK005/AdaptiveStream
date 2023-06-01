@@ -80,19 +80,9 @@ if __name__ == "__main__":
 						exemplar_count = 3,
 					)
 
-	# expert_ensemble = IndexedExpertEnsemble(
-	# 					tree_builder 		= tree_builder,
-	# 					index_dim 			= 3,
-	# 					buffer 				= LabelledFeatureBuffer(),
-	# 					scaling_rules 		= scaling_rules,
-	# 					scaling_policy 		= scaling_policy, 
-	# 					compaction_rules 	= [],
-	# 					compaction_policy 	= NoCompaction(),
-	# 					checkpoint_rules 	= checkpoint_rules,
-	# 					checkpoint_policy 	= checkpoint_policy
-	# 				)	
-
-	expert_ensemble = ExpertEnsemble(
+	expert_ensemble = IndexedExpertEnsemble(
+						tree_builder 		= tree_builder,
+						index_dim 			= 3,
 						buffer 				= LabelledFeatureBuffer(),
 						scaling_rules 		= scaling_rules,
 						scaling_policy 		= scaling_policy, 
@@ -100,11 +90,21 @@ if __name__ == "__main__":
 						compaction_policy 	= NoCompaction(),
 						checkpoint_rules 	= checkpoint_rules,
 						checkpoint_policy 	= checkpoint_policy
-					)
+					)	
+
+	# expert_ensemble = ExpertEnsemble(
+	# 					buffer 				= LabelledFeatureBuffer(),
+	# 					scaling_rules 		= scaling_rules,
+	# 					scaling_policy 		= scaling_policy, 
+	# 					compaction_rules 	= [],
+	# 					compaction_policy 	= NoCompaction(),
+	# 					checkpoint_rules 	= checkpoint_rules,
+	# 					checkpoint_policy 	= checkpoint_policy
+	# 				)
 
 	train_df 	= pd.read_csv(args.train_path)
 	train_df  	= train_df[
-					(train_df.request_time >= '2023-01-15') & 
+					(train_df.request_time >= '2023-01-01') & 
 					(train_df.request_time <= '2023-01-27')
 				]
 	train_df["epoch_time"] 	= pd.to_datetime(train_df["request_time"], format = "%Y-%m-%d").map(pd.Timestamp.timestamp)
