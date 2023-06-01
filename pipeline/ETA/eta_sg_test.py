@@ -43,14 +43,14 @@ if __name__ == "__main__":
 
 	for batch_feats, batch_labels in data_gen_testing.batch(100000):
 		row_count = batch_feats.shape[0]
-		percentile_smpls = int(row_count * 0.05)
+		percentile_smpls = int(row_count * args.sample_frac)
 		
 		feats_smpl 	= batch_feats[:percentile_smpls, :]
 		labels_smpl = batch_labels[:percentile_smpls]
 
 		pred = expert_ensemble.infer_w_smpls(input_data = batch_feats, 
 											 truth_smpls = (feats_smpl, labels_smpl), 
-											 alpha = 0.1)
+											 alpha = args.alpha)
 
 		last_expert_pred 	= expert_ensemble.experts[-1].infer(input_X = batch_feats)
 
