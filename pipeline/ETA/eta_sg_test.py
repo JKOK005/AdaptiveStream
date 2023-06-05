@@ -63,6 +63,9 @@ if __name__ == "__main__":
 		last_expert_loss 	+= loss_fn(batch_labels, last_expert_pred)
 		batch_count 		+= 1
 
+	import IPython
+	IPython.embed()
+
 	logging.info(f"Test count: {len(test_df)}")
 	logging.info(f"Average batch loss: {batch_loss / batch_count}")
 	logging.info(f"Last expert loss: {last_expert_loss / batch_count}")
