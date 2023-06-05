@@ -146,8 +146,4 @@ class ExpertEnsemble(object):
 
 		agg_score  	= alpha * scores_sm + (1 - alpha) * loss_sm
 		best_indx   = int(tf.argmin(agg_score))
-
-		import IPython
-		IPython.embed()
-
 		return all_experts[best_indx].infer(input_data)
