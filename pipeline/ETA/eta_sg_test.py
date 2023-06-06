@@ -10,7 +10,9 @@ python3 pipeline/ETA/eta_sg_test.py \
 --test_path data/smpl_train_sg.csv \
 --test_date '2023-01-28' \
 --alpha 0.1 \
---sample_frac 0.05
+--sample_frac 0.05 \
+--down_smpl_frac 1 \
+--down_smpl_seed 0
 """
 
 if __name__ == "__main__":
@@ -19,6 +21,8 @@ if __name__ == "__main__":
 	parser.add_argument('--test_path', type = str, nargs = '?', help = 'Path to test features')
 	parser.add_argument('--test_date', type = str, nargs = '?', help = 'Date filter for evaluating test')
 	parser.add_argument('--alpha', type = float, nargs = '?', help = 'Weighted ratio of using outlier loss to sample loss')
+	parser.add_argument('--down_smpl_frac', type = float, nargs = '?', help = 'Fraction to down sample test data')
+	parser.add_argument('--down_smpl_seed', type = int, nargs = '?', default = 0, help = 'Seed for sampling test dataset')
 	parser.add_argument('--sample_frac', type = float, nargs = '?', help = 'Fraction of test data to sample for computing sample loss')
 	args 	= parser.parse_args()
 
@@ -28,6 +32,7 @@ if __name__ == "__main__":
 	test_df  = pd.read_csv(args.test_path)
 	test_df  = test_df[test_df.request_time == args.test_date]
 	test_df  = test_df.drop("request_time", axis = 1)
+	test_df  = test_df.sample(frac = args.down_smpl_frac, random_state = args.down_smpl_seed)
 
 	feats_as_tensor   = tf.convert_to_tensor(test_df.drop("pred_diff", axis = 1).values, dtype = tf.float32)
 	labels_as_tensor  = tf.convert_to_tensor(test_df["pred_diff"].values, dtype = tf.float32)
