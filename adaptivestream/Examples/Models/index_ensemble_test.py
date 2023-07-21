@@ -69,7 +69,7 @@ def build_router(input_size):
 					"epochs" 		: 60,
 					"batch_size" 	: 64,
 					"loss_fn" 		: elbo,
-					"optimizer" 	: optimizers.Adam(learning_rate=1e-3),
+					"optimizer" 	: optimizers.legacy.Adam(learning_rate=1e-3),
 				},
 
 				inference_params = {
@@ -88,8 +88,8 @@ if __name__ == "__main__":
 	# Define scaling policy
 	model_wrapper 	= 	SupervisedModelWrapper(
 							base_model 		= build_net(12, 1),
-							optimizer 		= optimizers.SGD(learning_rate = 0.001),
-							loss 			= losses.BinaryCrossentropy(from_logits = False),
+							optimizer 		= optimizers.legacy.SGD(learning_rate = 0.001),
+							loss_fn 		= losses.BinaryCrossentropy(from_logits = False),
 							training_params = {
 								"epochs" 		: 1000,
 								"batch_size" 	: 64

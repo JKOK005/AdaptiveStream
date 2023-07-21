@@ -24,8 +24,8 @@ class SupervisedModelWrapper(ModelWrapper):
 		buffer_feat 	= buffer.get_data()
 		buffer_label 	= buffer.get_label()
 
-		self.model.compile(optimizer = self.optimizer, loss = self.loss)
-		self.model.fit(buffer_feat, buffer_label, **self.training_params)
+		self.model.compile(optimizer = self.optimizer, loss = self.loss_fn)
+		self.model.fit(x = buffer_feat, y = buffer_label, **self.training_params)
 		return
 
 	def infer(	self, input_X: tf.Tensor, 
