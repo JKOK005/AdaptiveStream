@@ -64,11 +64,11 @@ def build_model_wrapper(input_size, output_size):
 					]
 				)
 	criterion	= losses.MeanSquaredError()
-	optimizer 	= optimizers.SGD(learning_rate = 0.0001)
+	optimizer 	= optimizers.legacy.SGD(learning_rate = 0.0001)
 	return 	SupervisedModelWrapper(
 				base_model 		= base_model,
 				optimizer 		= optimizer,
-				loss 			= criterion,
+				loss_fn 		= criterion,
 				training_params = {
 					"epochs" 		: 1500,
 					"batch_size" 	: 64
