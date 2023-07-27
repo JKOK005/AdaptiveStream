@@ -47,7 +47,7 @@ def build_router(input_size):
 
 				training_params = {
 					"loss_fn" 		: elbo,
-					"optimizer" 	: optimizers.Adam(learning_rate=1e-3),
+					"optimizer" 	: optimizers.legacy.Adam(learning_rate=1e-3),
 				},
 
 				inference_params = {
