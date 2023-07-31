@@ -46,13 +46,13 @@ class EnsembleCompaction(CompactionPolicy):
             for weights_list in zip(*[model_wrapper.trained_model.model.get_weights() for model_wrapper in experts[-self.N-self.K:-self.N]]):
                 flag = True
                 for weight, value in zip(weights_list, weight):
-                if flag:
-                    temp_weight = weight * value
-                    flag = False
-                else:
-                    temp_weight += weight * value
-            temp_weight = temp_weight / self.K
-            merged_weights.append(temp_weight)
+                    if flag:
+                        temp_weight = weight * value
+                        flag = False
+                    else:
+                        temp_weight += weight * value
+                temp_weight = temp_weight / self.K
+                merged_weights.append(temp_weight)
             
             new_fallback_expert = tf.keras.models.clone_model(experts[0].trained_model.model)
             new_fallback_expert.set_weights(merged_weights)

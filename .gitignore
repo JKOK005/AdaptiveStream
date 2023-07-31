@@ -3,3 +3,4 @@ __pycache__
 data/
 checkpoint/
 .DS_Store
+adaptivestream/.DS_Store
