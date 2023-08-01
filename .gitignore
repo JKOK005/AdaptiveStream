@@ -2,3 +2,5 @@ __pycache__
 .python-version
 data/
 checkpoint/
+.DS_Store
+adaptivestream/.DS_Store

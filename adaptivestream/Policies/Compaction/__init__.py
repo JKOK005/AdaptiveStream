@@ -1,2 +1,6 @@
 from Policies.Compaction.CompactionPolicy import CompactionPolicy
 from Policies.Compaction.NoCompaction import NoCompaction
+from Policies.Compaction.AdaptationCompaction import AdaptationCompaction
+from Policies.Compaction.DistillCompaction import DistillCompaction
+from Policies.Compaction.EnsembleCompaction import EnsembleCompaction
+from Policies.Compaction.MetaCompaction import MetaCompaction
