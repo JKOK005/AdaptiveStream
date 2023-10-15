@@ -27,3 +27,12 @@ class Router(ABC):
 		ATTN: It is important to follow this convention when building future router classes.
 		"""
 		pass
+
+	@abstractmethod
+	def prob(self, *args, **kwargs) -> float:
+		"""
+		Computes the probability of the sampled batch of data belonging to the expert.
+
+		A batch of data that is more likely an outlier to the existing distribution used to train the expert will be assigned a low probability score.
+		"""
+		pass
