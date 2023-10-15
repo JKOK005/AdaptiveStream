@@ -1,6 +1,7 @@
 import tensorflow as tf
 from alibi_detect.od import OutlierVAE
 from Buffer.Buffer import Buffer
+from statistics import NormalDist
 from Models.Router.Router import Router
 
 class OutlierVAERouter(Router):

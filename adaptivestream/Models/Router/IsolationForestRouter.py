@@ -1,8 +1,8 @@
-import tensorflow as tf
 from Buffer.Buffer import Buffer
 from sklearn.ensemble import IsolationForest
 from statistics import NormalDist
 from Models.Router.Router import Router
+import tensorflow as tf
 
 class IsolationForestRouter(Router):
 	def __init__(self, 	init_params: dict, 

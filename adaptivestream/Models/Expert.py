@@ -30,6 +30,12 @@ class Expert(object):
 		"""
 		return self.router.score(input_X = input_X)
 
+	def prob(self, input_X, *args, **kwargs):
+		"""
+		Computes the probability that input_X belongs to the given expert
+		"""
+		return self.router.prob(input_X)
+
 	def infer(self, input_X, *args, **kwargs):
 		return self.trained_model.infer(input_X = input_X)
 	

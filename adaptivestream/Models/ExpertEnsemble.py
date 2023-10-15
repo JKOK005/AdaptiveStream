@@ -114,8 +114,8 @@ class ExpertEnsemble(object):
 	def infer(self, input_data):
 		# TODO: Evaluate on fall back expert logic
 		all_experts = [self.fallback_expert] + self.experts
-		scores 		= [each_expert.score(input_data) for each_expert in all_experts]
-		best_indx   = scores.index(min(scores))
+		probs  		= [each_expert.prob(input_data) for each_expert in all_experts]
+		best_indx   = probs.index(max(probs))
 		return all_experts[best_indx].infer(input_data)
 
 	def infer_w_smpls(self, input_data,
@@ -135,15 +135,13 @@ class ExpertEnsemble(object):
 		all_experts 				= [self.fallback_expert] + self.experts
 		(truth_feats, truth_labels) = truth_smpls
 
-		scores 		= [each_expert.score(input_data) for each_expert in all_experts]
+		probs  		= [each_expert.prob(input_data) for each_expert in all_experts]
+		probs 		= tf.cast(probs, tf.float32)
+
 		loss 		= [each_expert.loss(input_X = truth_feats, input_y = truth_labels) for each_expert in all_experts]
-
-		scores_sm  	= tf.math.softmax(tf.math.log(scores))
-		scores_sm 	= tf.cast(scores_sm, tf.float32)
-
 		loss_sm  	= tf.math.softmax(tf.math.log(loss))
 		loss_sm 	= tf.cast(loss_sm, tf.float32)
 
-		agg_score  	= alpha * scores_sm + (1 - alpha) * loss_sm
+		agg_score  	= alpha * (1 - probs) + (1 - alpha) * loss_sm
 		best_indx   = int(tf.argmin(agg_score))
 		return all_experts[best_indx].infer(input_data)
