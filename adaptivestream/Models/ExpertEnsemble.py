@@ -112,11 +112,16 @@ class ExpertEnsemble(object):
 		return
 
 	def infer(self, input_data):
-		# TODO: Evaluate on fall back expert logic
-		all_experts = [self.fallback_expert] + self.experts
-		probs  		= [each_expert.prob(input_data) for each_expert in all_experts]
-		best_indx   = probs.index(max(probs))
-		return all_experts[best_indx].infer(input_data)
+		probs  		= [each_expert.prob(input_data) for each_expert in self.experts]
+		max_probs 	= max(probs)
+
+		if max_probs >= 0.25:
+			best_indx   = probs.index(max_probs)
+			best_expert = self.experts[best_indx]
+		else:
+			# No experts achieve at least 25% confidence in infering current batch
+			best_expert = fallback_expert
+		return best_expert.infer(input_data)
 
 	def infer_w_smpls(self, input_data,
 							truth_smpls,
@@ -131,11 +136,11 @@ class ExpertEnsemble(object):
 		By virtue of the fact that a lower outlier_score / loss_ground implies better fit of the data, 
 		a lower value of S implies a more suitable expert for selection.
 		"""
-		# TODO: Evaluate on fall back expert logic
 		all_experts 				= [self.fallback_expert] + self.experts
 		(truth_feats, truth_labels) = truth_smpls
 
-		probs  		= [each_expert.prob(input_data) for each_expert in all_experts]
+		probs  		= [each_expert.prob(input_data) for each_expert in self.experts]
+		probs 		= [0.5 - min(max(probs), 0.5)] + probs
 		probs 		= tf.cast(probs, tf.float32)
 
 		loss 		= [each_expert.loss(input_X = truth_feats, input_y = truth_labels) for each_expert in all_experts]
