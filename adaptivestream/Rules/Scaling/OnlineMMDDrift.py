@@ -41,7 +41,6 @@ class OnlineMMDDrift(ScalingRules):
 													**self.init_params
 												)
 			else:
-				ert 				= self.init_params["ert"]
 				feats_latest 		= buffer.get_data_latest()
 				batch_drift 		= [self.drift_model.predict(each_feats)["data"]["is_drift"] for each_feats in feats_latest]
 				final_drift  		= max(batch_drift, key = batch_drift.count)
