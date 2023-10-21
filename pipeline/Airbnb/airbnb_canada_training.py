@@ -55,8 +55,9 @@ if __name__ == "__main__":
 								min_trigger_count = 800,
 								safety_timestep = 128,
 								init_params = {
-									"window_size" 	: 15,
-									"n_bootstraps" 	: 400,
+									"ert" 			: 100,
+									"window_size" 	: 20,
+									"n_bootstraps" 	: 500,
 								}
 							)
 						]
@@ -68,7 +69,7 @@ if __name__ == "__main__":
 						)
 
 	# Define checkpoint rules and policies
-	checkpoint_rules = 	[]
+	checkpoint_rules = 	[ SaveOnStateChange() ]
 
 	checkpoint_policy = DirectoryCheckpoint(save_path = args.save_path)
 
@@ -106,8 +107,6 @@ if __name__ == "__main__":
 			ingested_counts += len(batch_feats)
 			logging.info(f"Total data ingested: {ingested_counts}, cur file: {file}")
 
-		loss_fn  	= tf.keras.losses.MeanSquaredError(reduction = tf.keras.losses.Reduction.SUM) 
-		batch_loss 	= 0
-		batch_count = 0
-
-	logging.info(f"Average batch loss: {batch_loss / batch_count}")
+	if expert_ensemble.buffer.get_count() > 0:
+		expert_ensemble.scale_experts()
+		expert_ensemble.checkpoint_policy.save(expert_emsemble = expert_ensemble, log_state = True)
