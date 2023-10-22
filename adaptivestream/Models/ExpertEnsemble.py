@@ -87,8 +87,8 @@ class ExpertEnsemble(object):
 	def ingest(self, batch_input,
 					 batch_timestamp: int = -1,
 			):
-	
-		self.buffer.add(batch_input = batch_input, 
+		
+		self.buffer.add(batch_input = batch_input, 	
 						batch_timestamp = batch_timestamp)
 
 		is_compact 	= self._check_to_compact()
@@ -114,13 +114,13 @@ class ExpertEnsemble(object):
 	def infer(self, input_data):
 		probs  		= [each_expert.prob(input_data) for each_expert in self.experts]
 		max_probs 	= max(probs)
-
+		
 		if max_probs >= 0.25:
 			best_indx   = probs.index(max_probs)
 			best_expert = self.experts[best_indx]
 		else:
 			# No experts achieve at least 25% confidence in infering current batch
-			best_expert = fallback_expert
+			best_expert = self.fallback_expert
 		return best_expert.infer(input_data)
 
 	def infer_w_smpls(self, input_data,
