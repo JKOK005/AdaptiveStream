@@ -14,11 +14,11 @@ COLUMNS_CAT  		= 	[
 COLUMNS_NUMS 		= 	[
 							"bedrooms", "beds", "review_scores_rating", "review_scores_accuracy", 
 							"review_scores_cleanliness", "review_scores_checkin", "review_scores_communication",
-							"review_scores_location", "review_scores_value", 
+							"review_scores_location", "review_scores_value", "host_listings_count", 
+							"host_total_listings_count", 
 						]
 COLUMNS_UNTOUCHED  	= 	[	
-							"host_listings_count", "host_total_listings_count", "latitude", 
-							"longitude", "accommodates", "minimum_nights_avg_ntm",
+							"latitude", "longitude", "accommodates", "minimum_nights_avg_ntm",
 							"maximum_nights_avg_ntm", "availability_30", "availability_60",
 							"availability_90", "availability_365", "number_of_reviews",
 							"number_of_reviews_ltm", "number_of_reviews_l30d", "calculated_host_listings_count",

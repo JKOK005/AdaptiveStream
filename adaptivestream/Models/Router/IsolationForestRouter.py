@@ -21,7 +21,6 @@ class IsolationForestRouter(Router):
 					*args, **kwargs
 			):
 		feat 	= buffer.get_data()
-		print(feat.shape)
 		self.classifier.fit(feat)
 
 		scores 	= self.classifier.score_samples(feat) +1

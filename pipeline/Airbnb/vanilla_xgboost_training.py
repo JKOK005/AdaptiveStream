@@ -7,13 +7,13 @@ from xgboost import XGBRegressor
 
 """
 python3 pipeline/Airbnb/vanilla_xgboost_training.py \
---train_dir data/airbnb/train_2 \
---test_dir data/airbnb/test_2
+--train_dir data/airbnb/train \
+--test_dir data/airbnb/test
 """
 
 def build_net():
 	params = {	
-				"n_estimators" : 1000, 'min_child_weight': 1, 'learning_rate': 0.01, 'colsample_bytree': 0.3, 'max_depth': 10,
+				"n_estimators" : 100, 'min_child_weight': 1, 'learning_rate': 0.01, 'colsample_bytree': 0.3, 'max_depth': 10,
 	            'subsample': 0.9, 'lambda': 0.7, 'nthread': -1, 'booster': 'gbtree', 
 	            'gamma' : 0, 'eval_metric': 'mae', 'objective': 'reg:squarederror', 'seed' : 0, 'verbosity' : 1
             }
@@ -55,7 +55,7 @@ if __name__ == "__main__":
 	batch_loss 	= 0
 	batch_count = 0
 
-	for batch_feats, batch_labels in data_gen_testing.batch(8):
+	for batch_feats, batch_labels in data_gen_testing.batch(16):
 		pred = model.predict(batch_feats)
 		batch_loss 	+= loss_fn(batch_labels, pred)
 		batch_count += 1

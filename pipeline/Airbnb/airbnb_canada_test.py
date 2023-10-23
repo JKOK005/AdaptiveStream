@@ -38,18 +38,18 @@ if __name__ == "__main__":
 	batch_loss 			= 0
 	batch_count 		= 0
 
-	for batch_feats, batch_labels in data_gen_testing.batch(8):
-		# pred 		= expert_ensemble.infer(input_data = batch_feats[:, :-1])
+	for batch_feats, batch_labels in data_gen_testing.batch(16):
 		row_count = batch_feats.shape[0]
 		percentile_smpls = int(row_count * 0.3)
 		
-		feats_smpl 	= batch_feats[:percentile_smpls, :-1]
+		feats_smpl 	= batch_feats[:percentile_smpls, :]
 		labels_smpl = batch_labels[:percentile_smpls]
 
-		pred = expert_ensemble.infer_w_smpls(input_data = batch_feats[:, :-1], 
+		pred = expert_ensemble.infer_w_smpls(input_data = batch_feats, 
 											 truth_smpls = (feats_smpl, labels_smpl), 
 											 alpha = args.alpha)
 
+		# pred 		= expert_ensemble.infer(input_data = batch_feats)
 		batch_loss 	+= loss_fn(batch_labels, pred)
 		batch_count += 1
 		print(batch_count)

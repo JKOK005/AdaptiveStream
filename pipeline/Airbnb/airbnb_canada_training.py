@@ -20,13 +20,12 @@ from Examples.Math.index_tree_creation import *
 """
 python3 pipeline/Airbnb/airbnb_canada_training.py \
 --train_dir data/airbnb/train_2 \
---test_dir data/airbnb/test \
 --save_path checkpoint
 """
 
 def build_net():
 	params = {	
-				"n_estimators" : 1000, 'min_child_weight': 1, 'learning_rate': 0.01, 'colsample_bytree': 0.3, 'max_depth': 10,
+				"n_estimators" : 100, 'min_child_weight': 1, 'learning_rate': 0.01, 'colsample_bytree': 0.3, 'max_depth': 10,
 	            'subsample': 0.9, 'lambda': 0.7, 'nthread': -1, 'booster': 'gbtree', 
 	            'gamma' : 0, 'eval_metric': 'mae', 'objective': 'reg:squarederror', 'seed' : 0, 'verbosity' : 1
             }
@@ -43,7 +42,6 @@ def build_router():
 if __name__ == "__main__":
 	parser 		= argparse.ArgumentParser(description='SG ETA training of XG Boost models')
 	parser.add_argument('--train_dir', type = str, nargs = '?', help = 'Path to train features')
-	parser.add_argument('--test_dir', type = str, nargs = '?', help = 'Path to test features')
 	parser.add_argument('--save_path', type = str, nargs = '?', help = 'Model checkpoint path')
 	args 		= parser.parse_args()
 
@@ -57,7 +55,7 @@ if __name__ == "__main__":
 								init_params = {
 									"ert" 			: 100,
 									"window_size" 	: 20,
-									"n_bootstraps" 	: 500,
+									"n_bootstraps" 	: 300,
 								}
 							)
 						]
@@ -101,7 +99,7 @@ if __name__ == "__main__":
 
 		ingested_counts  = 0
 		for batch_feats, batch_labels in data_gen_training.batch(64):
-			batch_feats_wo_ts 	= batch_feats[:, :-1]
+			batch_feats_wo_ts 	= batch_feats
 			expert_ensemble.ingest(batch_input = (batch_feats_wo_ts, batch_labels))
 			
 			ingested_counts += len(batch_feats)
