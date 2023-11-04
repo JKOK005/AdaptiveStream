@@ -14,6 +14,7 @@ from adaptivestream.Rules.Scaling import OnlineMMDDrift
 from adaptivestream.Rules.Checkpoint import SaveOnStateChange
 from alibi_detect.models.tensorflow.losses import elbo
 from matplotlib import pyplot as plt
+from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 from Examples.Math.index_tree_creation import *
 
@@ -30,6 +31,12 @@ def build_net():
 	            'gamma' : 0, 'eval_metric': 'mae', 'objective': 'reg:squarederror', 'seed' : 0, 'verbosity' : 1
             }
 	return 	XGBRegressor(**params) 
+
+def build_net_randomforest():
+	params = {
+				"n_estimators" : 100, "max_depth" : 10, "random_state" : 0
+			}
+	return RandomForestRegressor(**params)
 
 def build_router():
 	return	IsolationForestRouter(
@@ -61,7 +68,7 @@ if __name__ == "__main__":
 						]
 						
 	model_wrapper 	= 	XGBoostModelWrapper(
-							xg_boost_model 	= build_net(),
+							xg_boost_model 	= build_net_randomforest(),
 							training_params = {},
 							loss_fn 		= tf.keras.losses.MeanSquaredError(reduction = tf.keras.losses.Reduction.SUM),
 						)

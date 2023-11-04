@@ -3,6 +3,7 @@ import glob
 import logging
 import pandas as pd
 import tensorflow as tf
+from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 
 """
@@ -18,6 +19,12 @@ def build_net():
 	            'gamma' : 0, 'eval_metric': 'mae', 'objective': 'reg:squarederror', 'seed' : 0, 'verbosity' : 1
             }
 	return 	XGBRegressor(**params) 
+
+def build_net_randomforest():
+	params = {
+				"n_estimators" : 100, "max_depth" : 10, "random_state" : 0
+			}
+	return RandomForestRegressor(**params)
 
 if __name__ == "__main__":
 	parser 		= argparse.ArgumentParser(description='SG ETA training of XG Boost models')
@@ -39,7 +46,7 @@ if __name__ == "__main__":
 	labels_as_tensor  = tf.convert_to_tensor(train_df["price"].values, dtype = tf.float32)
 	labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
 
-	model 		= build_net()
+	model 		= build_net_randomforest()
 	model.fit(feats_as_tensor, labels_as_tensor)
 
 	_dfs = []
