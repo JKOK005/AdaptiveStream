@@ -1,6 +1,7 @@
 import tensorflow as tf
 from alibi_detect.od import OutlierVAE
 from Buffer.Buffer import Buffer
+from statistics import NormalDist
 from Models.Router.Router import Router
 
 class OutlierVAERouter(Router):
@@ -16,6 +17,7 @@ class OutlierVAERouter(Router):
 		Ref: https://docs.seldon.io/projects/alibi-detect/en/stable/od/methods/vae.html
 		"""
 		self.classifier 		= OutlierVAE(**init_params)
+		self.prob_dist  		= None
 		self.training_params 	= training_params
 		self.inference_params 	= inference_params
 		return
@@ -23,8 +25,14 @@ class OutlierVAERouter(Router):
 	def train(self, buffer: Buffer,
 					*args, **kwargs
 			):
-		feat = buffer.get_data()
+		feat 	= buffer.get_data()
 		self.classifier.fit(feat, **self.training_params)
+
+		self.inference_params["outlier_type"] 			= "instance"
+		self.inference_params["return_instance_score"] 	= True
+		pred 	= self.classifier.predict(feat, **self.inference_params)
+		scores 	= spred["data"]["instance_score"]
+		self.prob_dist = NormalDist.from_samples(1 / (scores + 1e-3))
 		return
 
 	def permit_entry(self, 	input_X: tf.Tensor, 
@@ -45,3 +53,9 @@ class OutlierVAERouter(Router):
 		self.inference_params["return_instance_score"] 	= True
 		pred = self.classifier.predict(input_X, **self.inference_params)
 		return pred["data"]["instance_score"].mean()
+
+	def prob(self, 	input_X: tf.Tensor,
+					*args, **kwargs
+			) -> float:
+		batch_score = self.score(input_X)
+		return self.prob_dist.cdf(1 / batch_score)

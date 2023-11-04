@@ -45,7 +45,9 @@ if __name__ == "__main__":
 	rand_data 		= tf.random.uniform([1, feats_as_tensor.shape[1]])
 	
 	print(f"Test data passes router selection: {router.permit_entry(input_X = test_data)} \
-			with score: {router.score(input_X = test_data)}")
+			with score: {router.score(input_X = test_data)} and \
+			probability {router.prob(input_X = test_data)}")
 	
 	print(f"Random data passes router selection: {router.permit_entry(input_X = rand_data)} \
-			with score: {router.score(input_X = rand_data)}")
+			with score: {router.score(input_X = rand_data)} and \
+			probability {router.prob(input_X = rand_data)}")
