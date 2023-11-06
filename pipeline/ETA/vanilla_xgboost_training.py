@@ -15,7 +15,7 @@ python3 pipeline/ETA/vanilla_xgboost_training.py \
 
 def build_net():
 	params = {	
-				"n_estimators" : 1000, 'min_child_weight': 1, 'learning_rate': 0.01, 'colsample_bytree': 0.3, 'max_depth': 10,
+				"n_estimators" : 100, 'min_child_weight': 1, 'learning_rate': 0.01, 'colsample_bytree': 0.3, 'max_depth': 10,
 	            'subsample': 0.9, 'lambda': 0.7, 'nthread': -1, 'booster': 'gbtree', 
 	            'gamma' : 0, 'eval_metric': 'mae', 'objective': 'reg:squarederror', 'seed' : 0, 'verbosity' : 1
             }
