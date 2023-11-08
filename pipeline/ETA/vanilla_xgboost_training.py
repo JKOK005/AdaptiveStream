@@ -10,7 +10,9 @@ python3 pipeline/ETA/vanilla_xgboost_training.py \
 --test_path data/smpl_train_sg.csv \
 --train_date_start '2023-01-14' \
 --train_date_end '2023-01-21' \
---test_date '2023-01-22'
+--test_date_start '2023-01-27' \
+--test_date_end '2023-01-28' \
+--batch_size 64
 """
 
 def build_net():
@@ -27,7 +29,9 @@ if __name__ == "__main__":
 	parser.add_argument('--test_path', type = str, nargs='?', help='Path to test features')
 	parser.add_argument('--train_date_start', type = str, nargs = '?', help = 'Start date for training')
 	parser.add_argument('--train_date_end', type = str, nargs = '?', help = 'End date for training')
-	parser.add_argument('--test_date', type = str, nargs = '?', help = 'Date filter for evaluating test')
+	parser.add_argument('--test_date_start', type = str, nargs = '?', help = 'Start date filter for evaluating test')
+	parser.add_argument('--test_date_end', type = str, nargs = '?', help = 'End date filter for evaluating test')
+	parser.add_argument('--batch_size', type = int, nargs = '?', help = 'Batch size for inference')
 	args 		= parser.parse_args()
 
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -49,22 +53,24 @@ if __name__ == "__main__":
 	model 		= build_net()
 	model.fit(feats_as_tensor, labels_as_tensor)
 
-	test_df 	= pd.read_csv(args.test_path)
-	test_df  	= test_df[test_df.request_time == args.test_date]
-	test_df 	= test_df.drop("request_time", axis = 1)
+	df  		= pd.read_csv(args.test_path)
+	df 			= df[(df.request_time >= args.test_date_start) & (df.request_time <= args.test_date_end)]
 
-	feats_as_tensor   = tf.convert_to_tensor(test_df.drop("pred_diff", axis = 1).values, dtype = tf.float32)
-	labels_as_tensor  = tf.convert_to_tensor(test_df["pred_diff"].values, dtype = tf.float32)
-	data_gen_testing  = tf.data.Dataset.from_tensor_slices((feats_as_tensor, labels_as_tensor))
+	for each_test_date in df.request_time.unique():
+		test_df  		  = df[df.request_time == each_test_date]
+		test_df 		  = test_df.drop("request_time", axis = 1)
+		feats_as_tensor   = tf.convert_to_tensor(test_df.drop("pred_diff", axis = 1).values, dtype = tf.float32)
+		labels_as_tensor  = tf.convert_to_tensor(test_df["pred_diff"].values, dtype = tf.float32)
+		data_gen_testing  = tf.data.Dataset.from_tensor_slices((feats_as_tensor, labels_as_tensor))
 
-	loss_fn  	= tf.keras.losses.MeanSquaredError(reduction = tf.keras.losses.Reduction.SUM) 
-	batch_loss 	= 0
-	batch_count = 0
+		loss_fn  	= tf.keras.losses.MeanSquaredError(reduction = tf.keras.losses.Reduction.SUM) 
+		batch_loss 	= 0
+		batch_count = 0
 
-	for batch_feats, batch_labels in data_gen_testing.batch(100000):
-		pred = model.predict(batch_feats)
-		batch_loss 	+= loss_fn(batch_labels, pred)
-		batch_count += 1
+		for batch_feats, batch_labels in data_gen_testing.batch(args.batch_size):
+			pred = model.predict(batch_feats)
+			batch_loss 	+= loss_fn(batch_labels, pred)
+			batch_count += 1
 
-	logging.info(f"Test count: {len(test_df)}")
-	logging.info(f"Average batch loss: {batch_loss / batch_count}")
+		logging.info(f"Test count: {len(test_df)}, date: {each_test_date}")
+		logging.info(f"Average batch loss: {batch_loss / batch_count}")
