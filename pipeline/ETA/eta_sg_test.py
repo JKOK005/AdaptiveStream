@@ -66,6 +66,9 @@ if __name__ == "__main__":
 
 			last_expert_pred 	= expert_ensemble.experts[-1].infer(input_X = batch_feats)
 
+			import IPython
+			IPython.embed()
+
 			batch_loss 			+= loss_fn(batch_labels, pred)
 			last_expert_loss 	+= loss_fn(batch_labels, last_expert_pred)
 			batch_count 		+= 1
