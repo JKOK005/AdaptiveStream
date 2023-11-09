@@ -149,8 +149,8 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 			
 		if is_compact:
 			(new_fallback_expert, new_experts) 	= self.compaction_policy.compact(
-													expert_chain = self.experts, 
-													prev_fallback_expert = self.fallback_expert, 
+													experts = self.experts, 
+													fallback_expert = self.fallback_expert, 
 												)
 
 			self.fallback_expert = new_fallback_expert

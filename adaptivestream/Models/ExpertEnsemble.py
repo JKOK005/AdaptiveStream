@@ -60,7 +60,7 @@ class ExpertEnsemble(object):
 			if type(rule) == tuple:
 				return all([check(rule = each_rule) for each_rule in rule])
 			else:
-				return rule.check_compact(experts = self.experts)
+				return rule.check_compaction(experts = self.experts)
 		decisions 	= [check(rule = each_rule) for each_rule in self.compaction_rules]
 		return any(decisions)
 
@@ -96,8 +96,8 @@ class ExpertEnsemble(object):
 			
 		if is_compact:
 			(new_fallback_expert, new_experts) 	= self.compaction_policy.compact(
-													expert_chain = self.experts, 
-													prev_fallback_expert = self.fallback_expert, 
+													experts = self.experts, 
+													fallback_expert = self.fallback_expert, 
 												)
 
 			self.fallback_expert = new_fallback_expert

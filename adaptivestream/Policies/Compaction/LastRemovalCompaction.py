@@ -1,8 +1,8 @@
 from Policies.Compaction import CompactionPolicy
 
-class NoCompaction(CompactionPolicy):
+class LastRemovalCompaction(CompactionPolicy):
 	def compact(self, experts, 
 					  fallback_expert,
 					  *args, **kwargs
 				):
-		return fallback_expert, experts
+		return experts[0], experts[1:]
