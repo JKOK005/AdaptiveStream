@@ -151,5 +151,5 @@ class ExpertEnsemble(object):
 
 		agg_score  	= alpha * (1 - probs) + (1 - alpha) * loss_sm
 		best_indx   = int(tf.argmin(agg_score))
-		self.logger.info(f"Best expert index: {best_indx}, experts: {len(all_experts)}")
+		print(f"Best expert index: {best_indx}, experts: {len(all_experts)}")
 		return all_experts[best_indx].infer(input_data)
