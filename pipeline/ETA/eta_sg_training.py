@@ -9,7 +9,7 @@ from adaptivestream.Models.Wrapper import XGBoostModelWrapper
 from adaptivestream.Policies.Compaction import NoCompaction
 from adaptivestream.Policies.Scaling import NaiveScaling
 from adaptivestream.Policies.Checkpoint import DirectoryCheckpoint
-from adaptivestream.Rules.Scaling import BufferSizeLimit, TimeLimit
+from adaptivestream.Rules.Scaling import BufferSizeLimit, TimeLimit, OnlineMMDDrift
 from adaptivestream.Rules.Checkpoint import SaveOnStateChange
 from alibi_detect.models.tensorflow.losses import elbo
 from matplotlib import pyplot as plt
@@ -53,8 +53,20 @@ if __name__ == "__main__":
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 	# Define scaling rules
+	# scaling_rules 	= 	[
+	# 						TimeLimit(interval_sec = 7 * 24 * 60 * 60)
+	# 					]
+
 	scaling_rules 	= 	[
-							TimeLimit(interval_sec = 7 * 24 * 60 * 60)
+							OnlineMMDDrift(
+								min_trigger_count = 800,
+								safety_timestep = 256,
+								init_params = {
+									"ert" 			: 100,
+									"window_size" 	: 20,
+									"n_bootstraps" 	: 300,
+								}
+							)
 						]
 						
 	model_wrapper 	= 	XGBoostModelWrapper(
@@ -76,6 +88,10 @@ if __name__ == "__main__":
 							model 	= model_wrapper,
 							router 	= model_router
 						)
+
+	compaction_rules 	= []
+
+	compaction_policy 	= NoCompaction()
 
 	tree_builder 	= IndexTreeBuilder(
 						leaf_expert_count = 3, 
@@ -99,8 +115,8 @@ if __name__ == "__main__":
 						buffer 				= LabelledFeatureBuffer(),
 						scaling_rules 		= scaling_rules,
 						scaling_policy 		= scaling_policy, 
-						compaction_rules 	= [],
-						compaction_policy 	= NoCompaction(),
+						compaction_rules 	= compaction_rules,
+						compaction_policy 	= compaction_policy,
 						checkpoint_rules 	= checkpoint_rules,
 						checkpoint_policy 	= checkpoint_policy
 					)
