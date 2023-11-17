@@ -1,6 +1,7 @@
 from __future__ import annotations
 from Math import ClusterTools, OptimizationTools
 from Models import Expert, ExpertEnsemble
+import logging
 import numpy as np
 import tensorflow as tf
 
@@ -103,6 +104,7 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		super(IndexedExpertEnsemble, self).__init__(*args, **kwargs)
 		self.tree_builder 	= tree_builder
 		self.index_dim  	= index_dim
+		self.logger  		= logging.getLogger("IndexedExpertEnsemble")
 		return
 
 	def _index_last(self):

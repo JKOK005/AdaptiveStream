@@ -1,3 +1,4 @@
+import logging
 import tensorflow as tf
 import uuid
 
@@ -33,6 +34,7 @@ class ExpertEnsemble(object):
 		self.checkpoint_rules 	= checkpoint_rules
 		self.checkpoint_policy  = checkpoint_policy
 		self.buffer 			= buffer
+		self.logger  			= logging.getLogger("ExpertEnsemble")
 
 		self.scaling_policy.set_buffer(buffer = buffer)
 		self.compaction_policy.set_buffer(buffer = buffer)
@@ -149,4 +151,5 @@ class ExpertEnsemble(object):
 
 		agg_score  	= alpha * (1 - probs) + (1 - alpha) * loss_sm
 		best_indx   = int(tf.argmin(agg_score))
+		self.logger.info(f"Best expert index: {best_indx}, experts: {len(all_experts)}")
 		return all_experts[best_indx].infer(input_data)
