@@ -53,20 +53,8 @@ if __name__ == "__main__":
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 	# Define scaling rules
-	# scaling_rules 	= 	[
-	# 						TimeLimit(interval_sec = 7 * 24 * 60 * 60)
-	# 					]
-
 	scaling_rules 	= 	[
-							OnlineMMDDrift(
-								min_trigger_count = 800,
-								safety_timestep = 256,
-								init_params = {
-									"ert" 			: 100,
-									"window_size" 	: 20,
-									"n_bootstraps" 	: 300,
-								}
-							)
+							TimeLimit(interval_sec = 7 * 24 * 60 * 60)
 						]
 						
 	model_wrapper 	= 	XGBoostModelWrapper(
