@@ -4,7 +4,7 @@ from tensorflow.keras.layers import Dense, Input, Flatten, Conv2D, MaxPooling2D,
 
 class VggNet16Factory(object):
 	@classmethod
-	def get_model(cls, input_shape):
+	def get_model(cls, input_shape: (int), output_size: int):
 		return 	Sequential([
 					Input(shape = input_shape),
 					Conv2D(filters = 64, kernel_size = (3,3), padding = "same", activation = "relu"),
@@ -30,5 +30,5 @@ class VggNet16Factory(object):
 					Dropout(0.5),
 					Dense(units = 4096, activation="relu"),
 					Dropout(0.5),
-					Dense(units = 5, activation="softmax"),
+					Dense(units = output_size, activation="softmax"),
 				])
