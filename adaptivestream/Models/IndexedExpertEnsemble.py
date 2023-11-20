@@ -1,6 +1,7 @@
 from __future__ import annotations
 from Math import ClusterTools, OptimizationTools
 from Models import Expert, ExpertEnsemble
+import logging
 import numpy as np
 import tensorflow as tf
 
@@ -103,6 +104,7 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 		super(IndexedExpertEnsemble, self).__init__(*args, **kwargs)
 		self.tree_builder 	= tree_builder
 		self.index_dim  	= index_dim
+		self.logger  		= logging.getLogger("IndexedExpertEnsemble")
 		return
 
 	def _index_last(self):
@@ -149,8 +151,8 @@ class IndexedExpertEnsemble(ExpertEnsemble):
 			
 		if is_compact:
 			(new_fallback_expert, new_experts) 	= self.compaction_policy.compact(
-													expert_chain = self.experts, 
-													prev_fallback_expert = self.fallback_expert, 
+													experts = self.experts, 
+													fallback_expert = self.fallback_expert, 
 												)
 
 			self.fallback_expert = new_fallback_expert
