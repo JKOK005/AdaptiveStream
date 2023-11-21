@@ -6,6 +6,7 @@ from adaptivestream.Buffer import LabelledFeatureBuffer
 from adaptivestream.Models import ExpertEnsemble
 from adaptivestream.Models.Router import OutlierVAERouter
 from adaptivestream.Models.Wrapper import SupervisedModelWrapper
+from adaptivestream.Models.Net import VggNet16Factory
 from adaptivestream.Policies.Compaction import NoCompaction
 from adaptivestream.Policies.Scaling import NaiveScaling
 from adaptivestream.Policies.Checkpoint import DirectoryCheckpoint
@@ -20,28 +21,53 @@ python3 ...
 """
 
 def build_net():
-	pass
+	return VggNet16Factory.get_model(input_shape = (128, 128, 3), output_size = 5)
 
-def build_router(input_shape: (int), output_size: int):
-	encoder = Sequential([
+def build_router(input_shape: (int), latent_dim: int):
+	encoder_net = Sequential([
 		Input(shape = input_shape),
 		Conv2D(filters = 64, kernel_size = (3,3), padding = "same", activation = "relu"),
 		Conv2D(filters = 32, kernel_size = (3,3), padding = "same", activation = "relu"),
 		Flatten(),
-		Dense(units = output_size),
+		Dense(units = latent_dim),
 	])
 
-	decoder = Sequential([
-		Input(shape = (output_size, 1)),
-		Dense(units = output_size),
-		Reshape(target_shape = (4, 4, 128)),
-		Conv2DTranspose(256, 4, strides=2, padding='same', activation = "relu"),
-		Conv2DTranspose(64, 4, strides=2, padding='same', activation = "relu"),
-		Conv2DTranspose(3, 4, strides=2, padding='same', activation='sigmoid')
+	decoder_net = Sequential([
+		Input(shape = (latent_dim)),
+		Dense(units = int(input_shape[0] / 8 * input_shape[0] / 8 * 128)),
+		Reshape(target_shape = (int(input_shape[0] / 8), int(input_shape[0] / 8), 128)),
+		Conv2DTranspose(128, (3,3), strides = 2, padding='same', activation = "relu"),
+		Conv2DTranspose(64, (3,3), strides = 2, padding='same', activation = "relu"),
+		Conv2DTranspose(3, 4, strides = 2, padding='same', activation='relu')
 	])
 
-def build_drift_feature_extractor():
-	pass 
+	return OutlierVAERouter(
+		init_params = {
+			"threshold" 	: 0.1,
+		    "encoder_net" 	: encoder_net,
+		    "decoder_net" 	: decoder_net,
+		    "latent_dim" 	: latent_dim,
+		    "samples" 		: 10
+		},
+
+		training_params = {
+			"epochs" 		: 100, 
+			"batch_size" 	: 128,
+			"verbose" 		: True,
+		}, 
+
+		inference_params = {}
+	)
+
+def build_drift_feature_extractor(input_shape: (int), , latent_dim: int):
+	encoder_net = Sequential([
+		Input(shape = input_shape),
+		Conv2D(filters = 64, kernel_size = (3,3), padding = "same", activation = "relu"),
+		Conv2D(filters = 32, kernel_size = (3,3), padding = "same", activation = "relu"),
+		Flatten(),
+		Dense(units = latent_dim),
+	])
+	return encoder_net
 
 if __name__ == "__main__":
 	parser 		= argparse.ArgumentParser(description='Linear AdaptiveStream training on Core50')
@@ -60,7 +86,10 @@ if __name__ == "__main__":
 									"ert" 			: 100,
 									"window_size" 	: 20,
 									"n_bootstraps" 	: 300,
-									"preprocess_fn" : build_drift_feature_extractor(),
+									"preprocess_fn" : build_drift_feature_extractor(
+														input_shape = (128, 128, 3), 
+														latent_dim = 1024
+													),
 								}
 							)
 						]
@@ -82,7 +111,7 @@ if __name__ == "__main__":
 							training_params = {}, 
 						)
 
-	model_router  	= 	build_router()
+	model_router  	= 	build_router(input_shape = (128, 128, 3), latent_dim = 1024)
 
 	scaling_policy  = 	NaiveScaling(
 							model 	= model_wrapper,
