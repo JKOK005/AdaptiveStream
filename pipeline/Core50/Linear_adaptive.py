@@ -131,7 +131,8 @@ if __name__ == "__main__":
 	compaction_policy 	= LastRemovalCompaction()
 
 	# Define checkpoint rules and policies
-	checkpoint_rules = 	[ SaveOnStateChange() ]
+	# checkpoint_rules = 	[ SaveOnStateChange() ]
+	checkpoint_rules = 	[]
 
 	checkpoint_policy = DirectoryCheckpoint(save_path = args.save_path)
 
