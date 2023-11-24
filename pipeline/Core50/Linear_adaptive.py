@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
 			ingested_counts  = 0
 			expert_ensemble.ingest(batch_input = (feats_as_tensor, labels_as_tensor))
-			ingested_counts += len(batch_feats)
+			ingested_counts += len(feats_as_tensor)
 			logging.info(f"Total data ingested: {ingested_counts}, cur file: {file}")
 
 	if expert_ensemble.buffer.get_count() > 0:
