@@ -26,12 +26,11 @@ class SupervisedModelWrapper(ModelWrapper):
 
 		# Deep copy all other attributes
 		for k, v in self.__dict__.items():
+			if k == "base_model":
+				setattr(result, k, tf.keras.models.clone_model(v))
 
-		if k == "base_model":
-			setattr(result, k, tf.keras.models.clone_model(v))
-
-		else:
-			setattr(result, k, copy.deepcopy(v, memo))
+			else:
+				setattr(result, k, copy.deepcopy(v, memo))
 
 		# Return updated instance
 		return result
