@@ -1,3 +1,4 @@
+import copy
 import tensorflow as tf
 import logging
 from Buffer.Buffer import Buffer
@@ -17,6 +18,23 @@ class SupervisedModelWrapper(ModelWrapper):
 		self.training_params 	= training_params
 		self.logger  			= logging.getLogger("SupervisedModelWrapper")
 		return
+
+	def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+
+        # Deep copy all other attributes
+        for k, v in self.__dict__.items():
+
+        	if k == "base_model":
+        		setattr(result, k, tf.keras.models.clone_model(v))
+
+        	else:
+            	setattr(result, k, copy.deepcopy(v, memo))
+
+        # Return updated instance
+        return result
 
 	def train(	self, buffer: Buffer, 
 				*args, **kwargs
