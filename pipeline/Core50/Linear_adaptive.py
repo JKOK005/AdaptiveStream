@@ -27,7 +27,7 @@ python3 pipeline/Core50/Linear_adaptive.py \
 """
 
 def build_net():
-	return VggNet16Factory.get_model(input_shape = (128, 128, 3), output_size = 5)
+	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 5)
 
 def build_router(input_shape: (int), latent_dim: int):
 	encoder_net = Sequential([
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 									"window_size" 	: 20,
 									"n_bootstraps" 	: 300,
 									"preprocess_fn" : build_drift_feature_extractor(
-														input_shape = (128, 128, 3), 
+														input_shape = (128, 128, 3,), 
 														latent_dim = 1024
 													),
 								}
@@ -121,7 +121,7 @@ if __name__ == "__main__":
 							}, 
 						)
 
-	model_router  	= 	build_router(input_shape = (128, 128, 3), latent_dim = 1024)
+	model_router  	= 	build_router(input_shape = (128, 128, 3,), latent_dim = 1024)
 
 	scaling_policy  = 	NaiveScaling(
 							model 	= model_wrapper,
