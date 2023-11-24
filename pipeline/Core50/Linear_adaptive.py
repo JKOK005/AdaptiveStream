@@ -87,8 +87,8 @@ if __name__ == "__main__":
 	# Define scaling rules
 	scaling_rules 	= 	[
 							OnlineMMDDrift(
-								min_trigger_count = 800,
-								safety_timestep = 128,
+								min_trigger_count = 32,
+								safety_timestep = 32,
 								init_params = {
 									"ert" 			: 100,
 									"window_size" 	: 20,
