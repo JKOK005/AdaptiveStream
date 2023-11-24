@@ -43,7 +43,7 @@ class OnlineMMDDrift(ScalingRules):
 			else:
 				feats_latest 		= buffer.get_data_latest()
 				batch_drift 		= self.drift_model.predict(feats_latest)["data"]["is_drift"]
-				self.ert_timesteps 	+= len(batch_drift)
+				self.ert_timesteps 	+= len(feats_latest)
 			
 				if self.ert_timesteps >= self.safety_timestep:
 					self.ert_timesteps = 0
