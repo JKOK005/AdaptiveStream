@@ -32,8 +32,8 @@ def build_net():
 def build_router(input_shape: (int), latent_dim: int):
 	encoder_net = Sequential([
 		Input(shape = input_shape),
-		Conv2D(filters = 64, kernel_size = (3,3), padding = "same", activation = "relu"),
 		Conv2D(filters = 32, kernel_size = (3,3), padding = "same", activation = "relu"),
+		Conv2D(filters = 8, kernel_size = (3,3), padding = "same", activation = "relu"),
 		Flatten(),
 		Dense(units = latent_dim),
 	])
@@ -41,9 +41,9 @@ def build_router(input_shape: (int), latent_dim: int):
 	decoder_net = Sequential([
 		Input(shape = (latent_dim)),
 		Dense(units = int(input_shape[0] / 8 * input_shape[0] / 8 * 128)),
-		Reshape(target_shape = (int(input_shape[0] / 8), int(input_shape[0] / 8), 128)),
-		Conv2DTranspose(128, (3,3), strides = 2, padding='same', activation = "relu"),
-		Conv2DTranspose(64, (3,3), strides = 2, padding='same', activation = "relu"),
+		Reshape(target_shape = (int(input_shape[0] / 8), int(input_shape[0] / 8), 32)),
+		Conv2DTranspose(32, (3,3), strides = 2, padding='same', activation = "relu"),
+		Conv2DTranspose(8, (3,3), strides = 2, padding='same', activation = "relu"),
 		Conv2DTranspose(3, 4, strides = 2, padding='same', activation='relu')
 	])
 
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 							}, 
 						)
 
-	model_router  	= 	build_router(input_shape = (128, 128, 3,), latent_dim = 1024)
+	model_router  	= 	build_router(input_shape = (128, 128, 3,), latent_dim = 64)
 
 	scaling_policy  = 	NaiveScaling(
 							model 	= model_wrapper,
