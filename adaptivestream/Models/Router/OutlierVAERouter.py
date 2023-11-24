@@ -28,13 +28,10 @@ class OutlierVAERouter(Router):
 		feat 	= buffer.get_data()
 		self.classifier.fit(feat, **self.training_params)
 
-		import IPython
-		IPython.embed()
-
 		self.inference_params["outlier_type"] 			= "instance"
 		self.inference_params["return_instance_score"] 	= True
 		pred 	= self.classifier.predict(feat, **self.inference_params)
-		scores 	= spred["data"]["instance_score"]
+		scores 	= pred["data"]["instance_score"]
 		self.prob_dist = NormalDist.from_samples(1 / (scores + 1e-3))
 		return
 
