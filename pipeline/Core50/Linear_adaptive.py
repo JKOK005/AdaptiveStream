@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
 	for each_file in glob.glob(f"{args.train_dir}/*.npy"):
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
-		train_dat 	= np.random.shuffle(train_dat)
+		np.random.shuffle(train_dat)
 
 		for each_training_dat in tqdm(np.array_split(train_dat, 64)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
