@@ -29,6 +29,9 @@ class SupervisedModelWrapper(ModelWrapper):
 			if k == "base_model":
 				setattr(result, k, tf.keras.models.clone_model(v))
 
+			elif k == "optimizer" or k == "loss_fn":
+				setattr(result, k, v)
+
 			else:
 				setattr(result, k, copy.deepcopy(v, memo))
 
