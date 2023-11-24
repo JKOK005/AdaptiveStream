@@ -10,14 +10,19 @@ from adaptivestream.Models.Net import VggNet16Factory
 from adaptivestream.Policies.Compaction import NoCompaction
 from adaptivestream.Policies.Scaling import NaiveScaling
 from adaptivestream.Policies.Checkpoint import DirectoryCheckpoint
+from adaptivestream.Policies.Compaction import LastRemovalCompaction
 from adaptivestream.Rules.Scaling import OnlineMMDDrift
 from adaptivestream.Rules.Checkpoint import SaveOnStateChange
+from adaptivestream.Rules.Compaction import SizeRules
 from Examples.Math.index_tree_creation import *
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Input, Flatten, Conv2D, Conv2DTranspose, Reshape
 
 """
-python3 ...
+python3 pipeline/Core50/Linear_adaptive.py \
+--train_dir data/Core50/save/NI/train \
+--test_dir data/Core50/save/NI/test \
+--save_path checkpoint
 """
 
 def build_net():
@@ -59,7 +64,7 @@ def build_router(input_shape: (int), latent_dim: int):
 		inference_params = {}
 	)
 
-def build_drift_feature_extractor(input_shape: (int), , latent_dim: int):
+def build_drift_feature_extractor(input_shape: (int), latent_dim: int):
 	encoder_net = Sequential([
 		Input(shape = input_shape),
 		Conv2D(filters = 64, kernel_size = (3,3), padding = "same", activation = "relu"),
@@ -72,6 +77,7 @@ def build_drift_feature_extractor(input_shape: (int), , latent_dim: int):
 if __name__ == "__main__":
 	parser 		= argparse.ArgumentParser(description='Linear AdaptiveStream training on Core50')
 	parser.add_argument('--train_dir', type = str, nargs = '?', help = 'Path to train features')
+	parser.add_argument('--test_dir', type = str, nargs = '?', help = 'Path to train features')
 	parser.add_argument('--save_path', type = str, nargs = '?', help = 'Model checkpoint path')
 	args 		= parser.parse_args()
 
@@ -118,6 +124,11 @@ if __name__ == "__main__":
 							router 	= model_router
 						)
 
+	# Define compaction rules
+	compaction_rules 	= [SizeRules(0, 45)]
+
+	compaction_policy 	= LastRemovalCompaction()
+
 	# Define checkpoint rules and policies
 	checkpoint_rules = 	[ SaveOnStateChange() ]
 
@@ -127,29 +138,25 @@ if __name__ == "__main__":
 						buffer 				= LabelledFeatureBuffer(),
 						scaling_rules 		= scaling_rules,
 						scaling_policy 		= scaling_policy, 
-						compaction_rules 	= [],
-						compaction_policy 	= NoCompaction(),
+						compaction_rules 	= compaction_rules,
+						compaction_policy 	= compaction_policy,
 						checkpoint_rules 	= checkpoint_rules,
 						checkpoint_policy 	= checkpoint_policy
 					)
 
-	# for file in glob.glob(f"{args.train_dir}/*.csv"):
-	# 	train_df = pd.read_csv(file)
-	# 	train_df = train_df.sample(frac = 1)
+	for each_file in glob.glob(f"{args.train_dir}/*.npy"):
+		train_dat 	= np.load(each_file, allow_pickle = True) # load
 
-	# 	feats_as_tensor   = tf.convert_to_tensor(train_df.drop("price", axis = 1).values, dtype = tf.float32)
-	# 	labels_as_tensor  = tf.convert_to_tensor(train_df["price"].values, dtype = tf.float32)
-	# 	labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
-	# 	data_gen_training = tf.data.Dataset.from_tensor_slices((feats_as_tensor, labels_as_tensor))
+		for each_training_dat in np.array_split(train_dat, 64):
+			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
+			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
+			labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
 
-	# 	ingested_counts  = 0
-	# 	for batch_feats, batch_labels in data_gen_training.batch(64):
-	# 		batch_feats_wo_ts 	= batch_feats
-	# 		expert_ensemble.ingest(batch_input = (batch_feats_wo_ts, batch_labels))
-			
-	# 		ingested_counts += len(batch_feats)
-	# 		logging.info(f"Total data ingested: {ingested_counts}, cur file: {file}")
+			ingested_counts  = 0
+			expert_ensemble.ingest(batch_input = (feats_as_tensor, labels_as_tensor))
+			ingested_counts += len(batch_feats)
+			logging.info(f"Total data ingested: {ingested_counts}, cur file: {file}")
 
-	# if expert_ensemble.buffer.get_count() > 0:
-	# 	expert_ensemble.scale_experts()
-	# 	expert_ensemble.checkpoint_policy.save(expert_emsemble = expert_ensemble, log_state = True)
+	if expert_ensemble.buffer.get_count() > 0:
+		expert_ensemble.scale_experts()
+		expert_ensemble.checkpoint_policy.save(expert_emsemble = expert_ensemble, log_state = True)
