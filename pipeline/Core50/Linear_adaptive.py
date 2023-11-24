@@ -115,7 +115,10 @@ if __name__ == "__main__":
 							base_model 		= base_model,
 							optimizer 		= optimizer,
 							loss_fn 		= loss_fn,
-							training_params = {}, 
+							training_params = {
+								"batch_size" : 64,
+								"epochs" : 50,
+							}, 
 						)
 
 	model_router  	= 	build_router(input_shape = (128, 128, 3), latent_dim = 1024)
@@ -126,7 +129,7 @@ if __name__ == "__main__":
 						)
 
 	# Define compaction rules
-	compaction_rules 	= [SizeRules(0, 45)]
+	compaction_rules 	= [ SizeRules(0, 45) ]
 
 	compaction_policy 	= LastRemovalCompaction()
 
@@ -159,7 +162,7 @@ if __name__ == "__main__":
 			ingested_counts += len(feats_as_tensor)
 
 		logging.info(f"Total data ingested: {ingested_counts}, cur file: {each_file}")
-		
+
 	if expert_ensemble.buffer.get_count() > 0:
 		expert_ensemble.scale_experts()
 		expert_ensemble.checkpoint_policy.save(expert_emsemble = expert_ensemble, log_state = True)
