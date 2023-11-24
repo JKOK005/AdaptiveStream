@@ -17,12 +17,13 @@ from adaptivestream.Rules.Compaction import SizeRules
 from Examples.Math.index_tree_creation import *
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Input, Flatten, Conv2D, Conv2DTranspose, Reshape
+from tqdm import tqdm
 
 """
 python3 pipeline/Core50/Linear_adaptive.py \
---train_dir data/Core50/save/NI/train \
---test_dir data/Core50/save/NI/test \
---save_path checkpoint
+--train_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/train \
+--test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test \
+--save_path checkpoint/core50/vgg/linear
 """
 
 def build_net():
@@ -147,7 +148,7 @@ if __name__ == "__main__":
 	for each_file in glob.glob(f"{args.train_dir}/*.npy"):
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 
-		for each_training_dat in np.array_split(train_dat, 64):
+		for each_training_dat in tqdm(np.array_split(train_dat, 64)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])

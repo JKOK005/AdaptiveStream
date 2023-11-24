@@ -29,6 +29,9 @@ class DirectoryCheckpoint(CheckpointPolicy):
 
 		Path(model_save_path).mkdir(parents = False, exist_ok = False)
 
+		import IPython
+		IPython.embed()
+
 		with open(model_save_file, 'wb') as f:
 			pickle.dump(expert_emsemble, f)
 		
