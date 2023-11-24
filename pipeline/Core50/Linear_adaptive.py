@@ -88,9 +88,9 @@ if __name__ == "__main__":
 	scaling_rules 	= 	[
 							OnlineMMDDrift(
 								min_trigger_count = 32,
-								safety_timestep = 32,
+								safety_timestep = 256,
 								init_params = {
-									"ert" 			: 100,
+									"ert" 			: 256,
 									"window_size" 	: 20,
 									"n_bootstraps" 	: 300,
 									"preprocess_fn" : build_drift_feature_extractor(
