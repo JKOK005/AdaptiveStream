@@ -57,8 +57,8 @@ def build_router(input_shape: (int), latent_dim: int):
 		},
 
 		training_params = {
-			"epochs" 		: 100, 
-			"batch_size" 	: 128,
+			"epochs" 		: 10, 
+			"batch_size" 	: 32,
 			"verbose" 		: True,
 		}, 
 
