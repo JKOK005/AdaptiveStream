@@ -11,7 +11,7 @@ from adaptivestream.Policies.Compaction import NoCompaction
 from adaptivestream.Policies.Scaling import NaiveScaling
 from adaptivestream.Policies.Checkpoint import DirectoryCheckpoint
 from adaptivestream.Policies.Compaction import LastRemovalCompaction
-from adaptivestream.Rules.Scaling import OnlineMMDDrift
+from adaptivestream.Rules.Scaling import OnlineMMDDrift, BufferSizeLimit
 from adaptivestream.Rules.Checkpoint import SaveOnStateChange
 from adaptivestream.Rules.Compaction import SizeRules
 from Examples.Math.index_tree_creation import *
@@ -85,21 +85,23 @@ if __name__ == "__main__":
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
 	# Define scaling rules
-	scaling_rules 	= 	[
-							OnlineMMDDrift(
-								min_trigger_count = 32,
-								safety_timestep = 256,
-								init_params = {
-									"ert" 			: 256,
-									"window_size" 	: 20,
-									"n_bootstraps" 	: 300,
-									"preprocess_fn" : build_drift_feature_extractor(
-														input_shape = (128, 128, 3,), 
-														latent_dim = 1024
-													),
-								}
-							)
-						]
+	# scaling_rules 	= 	[
+	# 						OnlineMMDDrift(
+	# 							min_trigger_count = 32,
+	# 							safety_timestep = 256,
+	# 							init_params = {
+	# 								"ert" 			: 256,
+	# 								"window_size" 	: 20,
+	# 								"n_bootstraps" 	: 300,
+	# 								"preprocess_fn" : build_drift_feature_extractor(
+	# 													input_shape = (128, 128, 3,), 
+	# 													latent_dim = 1024
+	# 												),
+	# 							}
+	# 						)
+	# 					]
+
+	scaling_rules 	= [ BufferSizeLimit(max_size = 64) ]
 
 	base_model 	 	= 	build_net()
 
