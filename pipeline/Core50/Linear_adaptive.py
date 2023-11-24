@@ -27,7 +27,7 @@ python3 pipeline/Core50/Linear_adaptive.py \
 """
 
 def build_net():
-	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 5)
+	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
 def build_router(input_shape: (int), latent_dim: int):
 	encoder_net = Sequential([
@@ -119,7 +119,7 @@ if __name__ == "__main__":
 							loss_fn 		= loss_fn,
 							training_params = {
 								"batch_size" : 64,
-								"epochs" : 50,
+								"epochs" : 10,
 							}, 
 						)
 
