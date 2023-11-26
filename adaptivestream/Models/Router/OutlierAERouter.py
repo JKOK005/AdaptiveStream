@@ -48,6 +48,8 @@ class OutlierAERouter(Router):
 		pred 	= self.classifier.predict(feat, **self.inference_params)
 		scores 	= pred["data"]["instance_score"]
 		self.prob_dist = NormalDist.from_samples(1 / (scores + 1e-3))
+
+		tf.keras.backend.clear_session()
 		return
 
 	def permit_entry(self, 	input_X: tf.Tensor, 
