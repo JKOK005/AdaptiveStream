@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
 	base_model 	 	= 	build_net()
 
-	optimizer 		= 	tf.keras.optimizers.Adam(
+	optimizer 		= 	tf.keras.optimizers.legacy.Adam(
 							learning_rate = 0.001,
 						)
 
