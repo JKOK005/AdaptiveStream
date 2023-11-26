@@ -146,6 +146,11 @@ if __name__ == "__main__":
 						checkpoint_policy 	= checkpoint_policy
 					)
 
+	gpus = tf.config.experimental.list_physical_devices('GPU')
+	
+	for gpu in gpus:
+		tf.config.experimental.set_memory_growth(gpu, True)
+
 	for each_file in glob.glob(f"{args.train_dir}/*.npy"):
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 		np.random.shuffle(train_dat)
