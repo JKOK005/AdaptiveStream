@@ -79,6 +79,12 @@ if __name__ == "__main__":
 
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 
+	gpus = tf.config.experimental.list_physical_devices('GPU')
+	
+	for gpu in gpus:
+		tf.config.experimental.set_memory_growth(gpu, True)
+
+
 	# Define scaling rules
 	# scaling_rules 	= 	[
 	# 						OnlineMMDDrift(
@@ -145,11 +151,6 @@ if __name__ == "__main__":
 						checkpoint_rules 	= checkpoint_rules,
 						checkpoint_policy 	= checkpoint_policy
 					)
-
-	gpus = tf.config.experimental.list_physical_devices('GPU')
-	
-	for gpu in gpus:
-		tf.config.experimental.set_memory_growth(gpu, True)
 
 	for each_file in glob.glob(f"{args.train_dir}/*.npy"):
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
