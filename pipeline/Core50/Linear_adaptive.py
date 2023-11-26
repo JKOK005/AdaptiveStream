@@ -52,7 +52,7 @@ def build_router(input_shape: (int), latent_dim: int):
 
 		training_params = {
 			"epochs" 		: 2, 
-			"batch_size" 	: 8,
+			"batch_size" 	: 32,
 			"verbose" 		: False,
 		}, 
 
@@ -78,12 +78,6 @@ if __name__ == "__main__":
 	args 		= parser.parse_args()
 
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
-
-	gpus = tf.config.experimental.list_physical_devices('GPU')
-	
-	for gpu in gpus:
-		tf.config.experimental.set_memory_growth(gpu, True)
-
 
 	# Define scaling rules
 	# scaling_rules 	= 	[
@@ -119,7 +113,7 @@ if __name__ == "__main__":
 							optimizer 		= optimizer,
 							loss_fn 		= loss_fn,
 							training_params = {
-								"batch_size" : 8,
+								"batch_size" : 32,
 								"epochs" : 2,
 							}, 
 						)

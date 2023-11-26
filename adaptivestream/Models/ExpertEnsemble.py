@@ -109,9 +109,6 @@ class ExpertEnsemble(object):
 			self.scale_experts()
 			self._reset_scale()
 
-			import IPython
-			IPython.embed()
-
 		if self._check_to_checkpoint():
 			self.checkpoint_policy.save(expert_emsemble = self, log_state = True)
 		return
