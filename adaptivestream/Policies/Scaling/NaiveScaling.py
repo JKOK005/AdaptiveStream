@@ -20,6 +20,9 @@ class NaiveScaling(ScalingPolicy):
 		expert_model 	= copy.deepcopy(self.model_template)
 		expert_model.train(buffer = self.buffer)
 
+		import IPython
+		IPython.embed()
+
 		expert_router 	= copy.deepcopy(self.router_template)
 		expert_router.train(buffer = self.buffer)
 
