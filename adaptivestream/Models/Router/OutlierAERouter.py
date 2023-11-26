@@ -18,9 +18,24 @@ class OutlierAERouter(Router):
 		"""
 		self.classifier 		= OutlierAE(**init_params)
 		self.prob_dist  		= None
+		self.init_params 		= init_params
 		self.training_params 	= training_params
 		self.inference_params 	= inference_params
 		return
+
+	def __deepcopy__(self, memo):
+		cls = self.__class__
+		result = cls.__new__(cls)
+		memo[id(self)] = result
+
+		setattr(result, classifier, OutlierAE(**init_params))
+		setattr(result, prob_dist, None)
+		setattr(result, init_params, self.init_params)
+		setattr(result, training_params, self.training_params)
+		setattr(result, inference_params, self.inference_params)
+
+		# Return updated instance
+		return result
 
 	def train(self, buffer: Buffer,
 					*args, **kwargs
