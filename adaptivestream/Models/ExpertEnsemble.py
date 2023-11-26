@@ -93,8 +93,6 @@ class ExpertEnsemble(object):
 		self.buffer.add(batch_input = batch_input, 	
 						batch_timestamp = batch_timestamp)
 
-		print(f"Buffer size: {self.buffer.get_count()}")
-
 		is_compact 	= self._check_to_compact()
 		is_scale  	= self._check_to_scale()
 			

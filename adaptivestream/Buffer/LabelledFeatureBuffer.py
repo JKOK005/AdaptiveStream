@@ -11,7 +11,7 @@ class LabelledFeatureBuffer(LabelledBuffer):
 
 	feat_window  	= []
 	label_window  	= []
-	window_size  	= 7 	# TODO: Make this variable
+	window_size  	= 1 	# TODO: Make this variable
 	last_cleared 	= 0
 
 	def __init__(self, *args, **kwargs):
