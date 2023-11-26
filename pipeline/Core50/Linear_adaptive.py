@@ -4,7 +4,7 @@ import glob
 import tensorflow as tf
 from adaptivestream.Buffer import LabelledFeatureBuffer
 from adaptivestream.Models import ExpertEnsemble
-from adaptivestream.Models.Router import OutlierVAERouter
+from adaptivestream.Models.Router import OutlierAERouter
 from adaptivestream.Models.Wrapper import SupervisedModelWrapper
 from adaptivestream.Models.Net import VggNet16Factory
 from adaptivestream.Policies.Compaction import NoCompaction
@@ -30,16 +30,12 @@ def build_net():
 	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
 def build_router(input_shape: (int), latent_dim: int):
-	encoder_net = Sequential([
+	net = Sequential([
 		Input(shape = input_shape),
 		Conv2D(filters = 32, kernel_size = (3,3), padding = "same", activation = "relu"),
 		Conv2D(filters = 8, kernel_size = (3,3), padding = "same", activation = "relu"),
 		Flatten(),
 		Dense(units = latent_dim),
-	])
-
-	decoder_net = Sequential([
-		Input(shape = (latent_dim)),
 		Dense(units = int(input_shape[0] / 8 * input_shape[0] / 8 * 32)),
 		Reshape(target_shape = (int(input_shape[0] / 8), int(input_shape[0] / 8), 32)),
 		Conv2DTranspose(32, (3,3), strides = 2, padding='same', activation = "relu"),
@@ -47,13 +43,11 @@ def build_router(input_shape: (int), latent_dim: int):
 		Conv2DTranspose(3, 4, strides = 2, padding='same', activation='relu')
 	])
 
-	return OutlierVAERouter(
+	return OutlierAERouter(
 		init_params = {
 			"threshold" 	: 0.1,
-		    "encoder_net" 	: encoder_net,
-		    "decoder_net" 	: decoder_net,
-		    "latent_dim" 	: latent_dim,
-		    "samples" 		: 10
+		    "ae" 			: net,
+		    "data_type" 	: "image",
 		},
 
 		training_params = {
@@ -62,7 +56,8 @@ def build_router(input_shape: (int), latent_dim: int):
 			"verbose" 		: True,
 		}, 
 
-		inference_params = {}
+		inference_params = {
+		}
 	)
 
 def build_drift_feature_extractor(input_shape: (int), latent_dim: int):
