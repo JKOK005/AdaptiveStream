@@ -28,11 +28,11 @@ class OutlierAERouter(Router):
 		result = cls.__new__(cls)
 		memo[id(self)] = result
 
-		setattr(result, classifier, OutlierAE(**init_params))
-		setattr(result, prob_dist, None)
-		setattr(result, init_params, self.init_params)
-		setattr(result, training_params, self.training_params)
-		setattr(result, inference_params, self.inference_params)
+		setattr(result, "classifier", OutlierAE(**init_params))
+		setattr(result, "prob_dist", None)
+		setattr(result, "init_params", self.init_params)
+		setattr(result, "training_params", self.training_params)
+		setattr(result, "inference_params", self.inference_params)
 
 		# Return updated instance
 		return result
