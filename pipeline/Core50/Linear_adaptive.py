@@ -151,9 +151,11 @@ if __name__ == "__main__":
 					)
 
 	for each_file in glob.glob(f"{args.train_dir}/*.npy"):
+		logging.info(f"Reading: {each_file}")
+
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 		np.random.shuffle(train_dat)
-		train_dat   = train_dat[0:1000]
+		train_dat   = train_dat[0:100]
 		ingested_counts  = 0
 
 		for each_training_dat in tqdm(np.array_split(train_dat, 1)):
@@ -165,7 +167,7 @@ if __name__ == "__main__":
 			ingested_counts += len(feats_as_tensor)
 			tf.keras.backend.clear_session()
 
-		logging.info(f"Total data ingested: {ingested_counts}, cur file: {each_file}")
+		logging.info(f"Total data ingested: {ingested_counts}")
 
 	if expert_ensemble.buffer.get_count() > 0:
 		expert_ensemble.scale_experts()
