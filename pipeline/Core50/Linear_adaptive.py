@@ -96,7 +96,7 @@ if __name__ == "__main__":
 	# 						)
 	# 					]
 
-	scaling_rules 	= [ BufferSizeLimit(min_size = 7500) ]
+	scaling_rules 	= [ BufferSizeLimit(min_size = 3000) ]
 
 	base_model 	 	= 	build_net()
 
@@ -153,16 +153,15 @@ if __name__ == "__main__":
 	for each_file in glob.glob(f"{args.train_dir}/*.npy"):
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 		np.random.shuffle(train_dat)
+		ingested_counts  = 0
 
 		for each_training_dat in tqdm(np.array_split(train_dat, 8)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
 
-			ingested_counts  = 0
 			expert_ensemble.ingest(batch_input = (feats_as_tensor, labels_as_tensor))
 			ingested_counts += len(feats_as_tensor)
-
 			tf.keras.backend.clear_session()
 
 		logging.info(f"Total data ingested: {ingested_counts}, cur file: {each_file}")
