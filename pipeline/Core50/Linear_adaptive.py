@@ -34,18 +34,19 @@ def build_net():
 	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
 def build_router(input_shape: (int), latent_dim: int):
-	net = Sequential([
-		Input(shape = input_shape),
-		Conv2D(filters = 16, kernel_size = (3,3), padding = "same", activation = "relu"),
-		Conv2D(filters = 8, kernel_size = (3,3), padding = "same", activation = "relu"),
-		Flatten(),
-		Dense(units = latent_dim),
-		Dense(units = int(input_shape[0] / 8 * input_shape[0] / 8 * 16)),
-		Reshape(target_shape = (int(input_shape[0] / 8), int(input_shape[0] / 8), 16)),
-		Conv2DTranspose(16, (3,3), strides = 2, padding='same', activation = "relu"),
-		Conv2DTranspose(8, (3,3), strides = 2, padding='same', activation = "relu"),
-		Conv2DTranspose(3, 4, strides = 2, padding='same', activation='relu')
-	])
+	with tf.device('/CPU:0'):
+		net = Sequential([
+			Input(shape = input_shape),
+			Conv2D(filters = 16, kernel_size = (3,3), padding = "same", activation = "relu"),
+			Conv2D(filters = 8, kernel_size = (3,3), padding = "same", activation = "relu"),
+			Flatten(),
+			Dense(units = latent_dim),
+			Dense(units = int(input_shape[0] / 8 * input_shape[0] / 8 * 16)),
+			Reshape(target_shape = (int(input_shape[0] / 8), int(input_shape[0] / 8), 16)),
+			Conv2DTranspose(16, (3,3), strides = 2, padding='same', activation = "relu"),
+			Conv2DTranspose(8, (3,3), strides = 2, padding='same', activation = "relu"),
+			Conv2DTranspose(3, 4, strides = 2, padding='same', activation='relu')
+		])
 
 	return OutlierAERouter(
 		init_params = {
