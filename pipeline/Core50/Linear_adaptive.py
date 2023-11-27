@@ -2,6 +2,11 @@ import argparse
 import logging
 import glob
 import tensorflow as tf
+
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+tf.enable_eager_execution(config=config)
+
 from adaptivestream.Buffer import LabelledFeatureBuffer
 from adaptivestream.Models import ExpertEnsemble
 from adaptivestream.Models.Router import OutlierAERouter
