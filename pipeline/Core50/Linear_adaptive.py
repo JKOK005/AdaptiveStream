@@ -155,7 +155,7 @@ if __name__ == "__main__":
 
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 		np.random.shuffle(train_dat)
-		train_dat   = train_dat[0:100]
+		train_dat   = train_dat[0:2000]
 		ingested_counts  = 0
 
 		for each_training_dat in tqdm(np.array_split(train_dat, 1)):
