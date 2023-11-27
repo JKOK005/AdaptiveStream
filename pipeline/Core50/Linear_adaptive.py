@@ -2,17 +2,13 @@ import argparse
 import logging
 import glob
 import tensorflow as tf
-
-physical_devices = tf.config.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(physical_devices[0], True)
-
 from adaptivestream.Buffer import LabelledFeatureBuffer
 from adaptivestream.Models import ExpertEnsemble
 from adaptivestream.Models.Router import OutlierAERouter
 from adaptivestream.Models.Wrapper import SupervisedModelWrapper
 from adaptivestream.Models.Net import VggNet16Factory
 from adaptivestream.Policies.Compaction import NoCompaction
-from adaptivestream.Policies.Scaling import NaiveScaling
+from adaptivestream.Policies.Scaling import NaiveScaling, ExpertOnlyScaling
 from adaptivestream.Policies.Checkpoint import DirectoryCheckpoint
 from adaptivestream.Policies.Compaction import LastRemovalCompaction
 from adaptivestream.Rules.Scaling import OnlineMMDDrift, BufferSizeLimit
@@ -34,19 +30,18 @@ def build_net():
 	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
 def build_router(input_shape: (int), latent_dim: int):
-	with tf.device('/CPU:0'):
-		net = Sequential([
-			Input(shape = input_shape),
-			Conv2D(filters = 16, kernel_size = (3,3), padding = "same", activation = "relu"),
-			Conv2D(filters = 8, kernel_size = (3,3), padding = "same", activation = "relu"),
-			Flatten(),
-			Dense(units = latent_dim),
-			Dense(units = int(input_shape[0] / 8 * input_shape[0] / 8 * 16)),
-			Reshape(target_shape = (int(input_shape[0] / 8), int(input_shape[0] / 8), 16)),
-			Conv2DTranspose(16, (3,3), strides = 2, padding='same', activation = "relu"),
-			Conv2DTranspose(8, (3,3), strides = 2, padding='same', activation = "relu"),
-			Conv2DTranspose(3, 4, strides = 2, padding='same', activation='relu')
-		])
+	net = Sequential([
+		Input(shape = input_shape),
+		Conv2D(filters = 16, kernel_size = (3,3), padding = "same", activation = "relu"),
+		Conv2D(filters = 8, kernel_size = (3,3), padding = "same", activation = "relu"),
+		Flatten(),
+		Dense(units = latent_dim),
+		Dense(units = int(input_shape[0] / 8 * input_shape[0] / 8 * 16)),
+		Reshape(target_shape = (int(input_shape[0] / 8), int(input_shape[0] / 8), 16)),
+		Conv2DTranspose(16, (3,3), strides = 2, padding='same', activation = "relu"),
+		Conv2DTranspose(8, (3,3), strides = 2, padding='same', activation = "relu"),
+		Conv2DTranspose(3, 4, strides = 2, padding='same', activation='relu')
+	])
 
 	return OutlierAERouter(
 		init_params = {
@@ -125,9 +120,13 @@ if __name__ == "__main__":
 
 	model_router  	= 	build_router(input_shape = (128, 128, 3,), latent_dim = 64)
 
-	scaling_policy  = 	NaiveScaling(
+	# scaling_policy  = 	NaiveScaling(
+	# 						model 	= model_wrapper,
+	# 						router 	= model_router
+	# 					)
+
+	scaling_policy  = 	ExpertOnlyScaling(
 							model 	= model_wrapper,
-							router 	= model_router
 						)
 
 	# Define compaction rules
