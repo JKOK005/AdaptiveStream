@@ -32,13 +32,13 @@ def build_net():
 def build_router(input_shape: (int), latent_dim: int):
 	net = Sequential([
 		Input(shape = input_shape),
-		Conv2D(filters = 32, kernel_size = (3,3), padding = "same", activation = "relu"),
+		Conv2D(filters = 16, kernel_size = (3,3), padding = "same", activation = "relu"),
 		Conv2D(filters = 8, kernel_size = (3,3), padding = "same", activation = "relu"),
 		Flatten(),
 		Dense(units = latent_dim),
-		Dense(units = int(input_shape[0] / 8 * input_shape[0] / 8 * 32)),
-		Reshape(target_shape = (int(input_shape[0] / 8), int(input_shape[0] / 8), 32)),
-		Conv2DTranspose(32, (3,3), strides = 2, padding='same', activation = "relu"),
+		Dense(units = int(input_shape[0] / 8 * input_shape[0] / 8 * 16)),
+		Reshape(target_shape = (int(input_shape[0] / 8), int(input_shape[0] / 8), 16)),
+		Conv2DTranspose(16, (3,3), strides = 2, padding='same', activation = "relu"),
 		Conv2DTranspose(8, (3,3), strides = 2, padding='same', activation = "relu"),
 		Conv2DTranspose(3, 4, strides = 2, padding='same', activation='relu')
 	])
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 	# 						)
 	# 					]
 
-	scaling_rules 	= [ BufferSizeLimit(min_size = 64) ]
+	scaling_rules 	= [ BufferSizeLimit(min_size = 14500) ]
 
 	base_model 	 	= 	build_net()
 
@@ -150,7 +150,7 @@ if __name__ == "__main__":
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 		np.random.shuffle(train_dat)
 
-		for each_training_dat in tqdm(np.array_split(train_dat, len(train_dat) // len(train_dat))):
+		for each_training_dat in tqdm(np.array_split(train_dat, len(train_dat) // 8)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
