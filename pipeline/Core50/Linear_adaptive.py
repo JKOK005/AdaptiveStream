@@ -120,14 +120,14 @@ if __name__ == "__main__":
 
 	model_router  	= 	build_router(input_shape = (128, 128, 3,), latent_dim = 64)
 
-	# scaling_policy  = 	NaiveScaling(
-	# 						model 	= model_wrapper,
-	# 						router 	= model_router
-	# 					)
-
-	scaling_policy  = 	ExpertOnlyScaling(
+	scaling_policy  = 	NaiveScaling(
 							model 	= model_wrapper,
+							router 	= model_router
 						)
+
+	# scaling_policy  = 	ExpertOnlyScaling(
+	# 						model 	= model_wrapper,
+	# 					)
 
 	# Define compaction rules
 	compaction_rules 	= [ SizeRules(0, 45) ]
