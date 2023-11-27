@@ -96,7 +96,7 @@ if __name__ == "__main__":
 	# 						)
 	# 					]
 
-	scaling_rules 	= [ BufferSizeLimit(min_size = 14500) ]
+	scaling_rules 	= [ BufferSizeLimit(min_size = 7500) ]
 
 	base_model 	 	= 	build_net()
 
