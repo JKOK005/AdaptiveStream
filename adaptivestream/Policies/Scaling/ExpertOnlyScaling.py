@@ -12,7 +12,7 @@ class ExpertOnlyScaling(ScalingPolicy):
 	def __init__(self, 	model: ModelWrapper, 
 						*args, **kwargs
 				):
-		super(ExpertOnlyScaling, self).__init__(model = model, router = router)
+		super(ExpertOnlyScaling, self).__init__(model = model, router = None)
 		return
 
 	def train_expert(self, *args, **kwargs):
