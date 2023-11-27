@@ -45,11 +45,16 @@ class SupervisedModelWrapper(ModelWrapper):
 			):
 		buffer_feat 	= buffer.get_data()
 		buffer_label 	= buffer.get_label()
-		dataset 		= tf.data.Dataset.from_tensor_slices((buffer_feat, buffer_label)) \
-										 .batch(self.training_batch_size)
 
-		self.model.compile(optimizer = self.optimizer, loss = self.loss_fn)
-		self.model.fit(x = dataset, **self.training_params)
+		gpus = tf.config.list_logical_devices('GPU')
+		strategy = tf.distribute.MirroredStrategy(gpus)
+
+		with strategy.scope():
+			dataset 		= tf.data.Dataset.from_tensor_slices((buffer_feat, buffer_label)) \
+											 .batch(self.training_batch_size)
+
+			self.model.compile(optimizer = self.optimizer, loss = self.loss_fn)
+			self.model.fit(x = dataset, **self.training_params)
 		return
 
 	def infer(	self, input_X: tf.Tensor, 
