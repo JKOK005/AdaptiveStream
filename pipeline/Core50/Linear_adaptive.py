@@ -96,7 +96,7 @@ if __name__ == "__main__":
 	# 						)
 	# 					]
 
-	scaling_rules 	= [ BufferSizeLimit(min_size = 3000) ]
+	scaling_rules 	= [ BufferSizeLimit(min_size = 1) ]
 
 	base_model 	 	= 	build_net()
 
@@ -153,6 +153,7 @@ if __name__ == "__main__":
 	for each_file in glob.glob(f"{args.train_dir}/*.npy"):
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 		np.random.shuffle(train_dat)
+		train_dat   = train_dat[0:1000]
 		ingested_counts  = 0
 
 		for each_training_dat in tqdm(np.array_split(train_dat, 1)):
