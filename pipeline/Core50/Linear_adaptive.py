@@ -113,9 +113,9 @@ if __name__ == "__main__":
 							optimizer 		= optimizer,
 							loss_fn 		= loss_fn,
 							training_params = {
-								"batch_size" : 32,
 								"epochs" : 2,
 							}, 
+							training_batch_size = 32,
 						)
 
 	model_router  	= 	build_router(input_shape = (128, 128, 3,), latent_dim = 64)

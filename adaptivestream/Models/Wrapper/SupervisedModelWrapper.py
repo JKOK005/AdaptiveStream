@@ -9,14 +9,16 @@ class SupervisedModelWrapper(ModelWrapper):
 						optimizer: tf.keras.optimizers, 
 						loss_fn: tf.keras.losses,
 						training_params: dict,
+						training_batch_size: int,
 						*args, **kwargs
 				):
 		super(SupervisedModelWrapper, self).__init__()
-		self.loss_fn 			= loss_fn
-		self.model 				= base_model
-		self.optimizer 			= optimizer
-		self.training_params 	= training_params
-		self.logger  			= logging.getLogger("SupervisedModelWrapper")
+		self.loss_fn 				= loss_fn
+		self.model 					= base_model
+		self.optimizer 				= optimizer
+		self.training_params 		= training_params
+		self.training_batch_size 	= training_batch_size
+		self.logger  				= logging.getLogger("SupervisedModelWrapper")
 		return
 
 	def __deepcopy__(self, memo):
@@ -43,9 +45,11 @@ class SupervisedModelWrapper(ModelWrapper):
 			):
 		buffer_feat 	= buffer.get_data()
 		buffer_label 	= buffer.get_label()
+		dataset 		= tf.data.Dataset.from_tensor_slices((buffer_feat, buffer_label)) \
+										 .batch(training_batch_size)
 
 		self.model.compile(optimizer = self.optimizer, loss = self.loss_fn)
-		self.model.fit(x = buffer_feat, y = buffer_label, **self.training_params)
+		self.model.fit(x = dataset, **self.training_params)
 		return
 
 	def infer(	self, input_X: tf.Tensor, 
