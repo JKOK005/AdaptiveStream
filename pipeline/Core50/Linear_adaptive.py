@@ -158,7 +158,7 @@ if __name__ == "__main__":
 		train_dat   = train_dat
 		ingested_counts  = 0
 
-		for each_training_dat in tqdm(np.array_split(train_dat, 8)):
+		for each_training_dat in tqdm(np.array_split(train_dat, 32)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
