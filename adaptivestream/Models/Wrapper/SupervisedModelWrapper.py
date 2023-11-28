@@ -32,7 +32,6 @@ class SupervisedModelWrapper(ModelWrapper):
 		self.training_params 		= training_params
 		self.training_batch_size 	= training_batch_size
 		self.logger  				= logging.getLogger("SupervisedModelWrapper")
-		self.GPU_NUM 				= 0
 		return
 
 	def __deepcopy__(self, memo, *args, **kwargs):
@@ -47,9 +46,6 @@ class SupervisedModelWrapper(ModelWrapper):
 
 			elif k == "optimizer" or k == "loss_fn":
 				setattr(result, k, v)
-
-			elif k == "GPU_NUM":
-				setattr(result, k, kwargs["GPU_NUM"])
 
 			else:
 				setattr(result, k, copy.deepcopy(v, memo))
