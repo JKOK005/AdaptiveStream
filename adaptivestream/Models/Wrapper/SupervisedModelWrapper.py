@@ -12,7 +12,7 @@ def load_balance_gpu(fn):
 		selected_gpu = random.randint(0, len(gpus) -1)
 
 		with tf.device(f"/device:GPU:{selected_gpu}"):
-			print("Using GPU: {selected_gpu}")
+			print(f"Using GPU: {selected_gpu}")
 			return fn(*args, **kwargs)
 
 	return wrapper
