@@ -10,9 +10,9 @@ def load_balance_gpu(fn):
 
 	def wrapper(*args, **kwargs):
 		selected_gpu = random.randint(0, len(gpus) -1)
-		print(f"Training on GPU: {selected_gpu}")
 
 		with tf.device(f"/device:GPU:{selected_gpu}"):
+			kwargs["GPU_NUM"] = selected_gpu
 			return fn(*args, **kwargs)
 
 	return wrapper
@@ -32,8 +32,10 @@ class SupervisedModelWrapper(ModelWrapper):
 		self.training_params 		= training_params
 		self.training_batch_size 	= training_batch_size
 		self.logger  				= logging.getLogger("SupervisedModelWrapper")
+		self.GPU_NUM 				= 0
 		return
 
+	@load_balance_gpu
 	def __deepcopy__(self, memo, *args, **kwargs):
 		cls = self.__class__
 		result = cls.__new__(cls)
@@ -47,24 +49,29 @@ class SupervisedModelWrapper(ModelWrapper):
 			elif k == "optimizer" or k == "loss_fn":
 				setattr(result, k, v)
 
+			elif k == "GPU_NUM":
+				setattr(result, k, kwargs["GPU_NUM"])
+
 			else:
 				setattr(result, k, copy.deepcopy(v, memo))
 
 		# Return updated instance
 		return result
 
-	@load_balance_gpu
 	def train(	self, buffer: Buffer, 
 				*args, **kwargs
 			):
 		buffer_feat 	= buffer.get_data()
 		buffer_label 	= buffer.get_label()
 
-		dataset 		= tf.data.Dataset.from_tensor_slices((buffer_feat, buffer_label)) \
-										 .batch(self.training_batch_size)
+		with tf.device(f"/device:GPU:{self.selected_gpu}"):
+			print(f"Training on GPU: {self.selected_gpu}")
 
-		self.model.compile(optimizer = self.optimizer, loss = self.loss_fn)
-		self.model.fit(x = dataset, **self.training_params)
+			dataset 		= tf.data.Dataset.from_tensor_slices((buffer_feat, buffer_label)) \
+											 .batch(self.training_batch_size)
+
+			self.model.compile(optimizer = self.optimizer, loss = self.loss_fn)
+			self.model.fit(x = dataset, **self.training_params)
 		return
 
 	def infer(	self, input_X: tf.Tensor, 
