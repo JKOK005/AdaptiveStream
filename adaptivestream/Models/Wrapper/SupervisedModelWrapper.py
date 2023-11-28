@@ -64,8 +64,8 @@ class SupervisedModelWrapper(ModelWrapper):
 		buffer_feat 	= buffer.get_data()
 		buffer_label 	= buffer.get_label()
 
-		with tf.device(f"/device:GPU:{self.selected_gpu}"):
-			print(f"Training on GPU: {self.selected_gpu}")
+		with tf.device(f"/device:GPU:{self.GPU_NUM}"):
+			print(f"Training on GPU: {self.GPU_NUM}")
 
 			dataset 		= tf.data.Dataset.from_tensor_slices((buffer_feat, buffer_label)) \
 											 .batch(self.training_batch_size)
