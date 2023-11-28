@@ -155,10 +155,10 @@ if __name__ == "__main__":
 
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 		np.random.shuffle(train_dat)
-		train_dat   = train_dat[0:1500]
+		train_dat   = train_dat
 		ingested_counts  = 0
 
-		for each_training_dat in tqdm(np.array_split(train_dat, 100)):
+		for each_training_dat in tqdm(np.array_split(train_dat, 2)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
@@ -166,9 +166,5 @@ if __name__ == "__main__":
 			expert_ensemble.ingest(batch_input = (feats_as_tensor, labels_as_tensor))
 			ingested_counts += len(feats_as_tensor)
 			tf.keras.backend.clear_session()
-			break
 
 		logging.info(f"Total data ingested: {ingested_counts}")
-
-	import IPython
-	IPython.embed()
