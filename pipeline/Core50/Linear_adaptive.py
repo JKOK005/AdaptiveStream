@@ -27,11 +27,7 @@ python3 pipeline/Core50/Linear_adaptive.py \
 """
 
 def build_net():
-	gpus = tf.config.list_logical_devices('GPU')
-	strategy = tf.distribute.MirroredStrategy(gpus)
-
-	with strategy.scope():
-		return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
+	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
 def build_router(input_shape: (int), latent_dim: int):
 	net = Sequential([

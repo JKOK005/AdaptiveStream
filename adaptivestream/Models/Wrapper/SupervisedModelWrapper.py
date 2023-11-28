@@ -1,8 +1,21 @@
 import copy
 import tensorflow as tf
 import logging
+import random
 from Buffer.Buffer import Buffer
 from Models.Wrapper.ModelWrapper import ModelWrapper
+
+def load_balance_gpu(fn):
+	gpus = tf.config.list_physical_devices('GPU')
+
+	def wrapper(*args, **kwargs):
+		selected_gpu = random.randint(0, len(gpus) -1)
+
+		with tf.device(f"/device:GPU:{selected_gpu}"):
+			print("Using GPU: {selected_gpu}")
+			return fn(*args, **kwargs)
+
+	return wrapper
 
 class SupervisedModelWrapper(ModelWrapper):
 	def __init__(self, 	base_model: tf.keras.Model, 
@@ -21,6 +34,7 @@ class SupervisedModelWrapper(ModelWrapper):
 		self.logger  				= logging.getLogger("SupervisedModelWrapper")
 		return
 
+	@load_balance_gpu
 	def __deepcopy__(self, memo):
 		cls = self.__class__
 		result = cls.__new__(cls)
