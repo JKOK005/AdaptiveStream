@@ -70,10 +70,10 @@ class LabelledFeatureBuffer(LabelledBuffer):
 
 	def clear(self):
 		self.feat_window.append(self.feat)
-		self.feat_window  	= self.feat_window[-1 * self.window_size : ]
+		self.feat_window  	= self.feat_window[-1 * self.window_size : ] if self.window_size > 0 else []
 
 		self.label_window.append(self.label)
-		self.label_window  	= self.label_window[-1 * self.window_size : ]
+		self.label_window  	= self.label_window[-1 * self.window_size : ] if self.window_size > 0 else []
 
 		self.feat 			= None
 		self.label 			= None
