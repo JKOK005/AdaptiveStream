@@ -56,7 +56,7 @@ class SupervisedModelWrapper(ModelWrapper):
 			else:
 				setattr(result, k, copy.deepcopy(v, memo))
 
-			print(k, v)
+			print(result)
 
 		# Return updated instance
 		return result
