@@ -13,6 +13,7 @@ def load_balance_gpu(fn):
 
 		with tf.device(f"/device:GPU:{selected_gpu}"):
 			print(f"Using GPU: {selected_gpu}")
+			kwargs["GPU_NUM"] = selected_gpu
 			return fn(*args, **kwargs)
 
 	return wrapper
@@ -32,10 +33,11 @@ class SupervisedModelWrapper(ModelWrapper):
 		self.training_params 		= training_params
 		self.training_batch_size 	= training_batch_size
 		self.logger  				= logging.getLogger("SupervisedModelWrapper")
+		self.GPU_NUM 				= 0
 		return
 
 	@load_balance_gpu
-	def __deepcopy__(self, memo):
+	def __deepcopy__(self, memo, *args, **kwargs):
 		cls = self.__class__
 		result = cls.__new__(cls)
 		memo[id(self)] = result
@@ -48,8 +50,13 @@ class SupervisedModelWrapper(ModelWrapper):
 			elif k == "optimizer" or k == "loss_fn":
 				setattr(result, k, v)
 
+			elif k == "GPU_NUM":
+				setattr(result, k, kwargs["GPU_NUM"])
+
 			else:
 				setattr(result, k, copy.deepcopy(v, memo))
+
+			print(k, v)
 
 		# Return updated instance
 		return result
