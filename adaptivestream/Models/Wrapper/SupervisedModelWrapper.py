@@ -10,9 +10,9 @@ def load_balance_gpu(fn):
 
 	def wrapper(*args, **kwargs):
 		selected_gpu = random.randint(0, len(gpus) -1)
+		print(f"Training on GPU: {selected_gpu}")
 
 		with tf.device(f"/device:GPU:{selected_gpu}"):
-			kwargs["GPU_NUM"] = selected_gpu
 			return fn(*args, **kwargs)
 
 	return wrapper
@@ -35,7 +35,6 @@ class SupervisedModelWrapper(ModelWrapper):
 		self.GPU_NUM 				= 0
 		return
 
-	@load_balance_gpu
 	def __deepcopy__(self, memo, *args, **kwargs):
 		cls = self.__class__
 		result = cls.__new__(cls)
@@ -58,20 +57,18 @@ class SupervisedModelWrapper(ModelWrapper):
 		# Return updated instance
 		return result
 
+	@load_balance_gpu
 	def train(	self, buffer: Buffer, 
 				*args, **kwargs
 			):
 		buffer_feat 	= buffer.get_data()
 		buffer_label 	= buffer.get_label()
 
-		with tf.device(f"/device:GPU:{self.GPU_NUM}"):
-			print(f"Training on GPU: {self.GPU_NUM}")
+		dataset 		= tf.data.Dataset.from_tensor_slices((buffer_feat, buffer_label)) \
+										 .batch(self.training_batch_size)
 
-			dataset 		= tf.data.Dataset.from_tensor_slices((buffer_feat, buffer_label)) \
-											 .batch(self.training_batch_size)
-
-			self.model.compile(optimizer = self.optimizer, loss = self.loss_fn)
-			self.model.fit(x = dataset, **self.training_params)
+		self.model.compile(optimizer = self.optimizer, loss = self.loss_fn)
+		self.model.fit(x = dataset, **self.training_params)
 		return
 
 	def infer(	self, input_X: tf.Tensor, 
