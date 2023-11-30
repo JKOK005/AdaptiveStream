@@ -168,3 +168,4 @@ if __name__ == "__main__":
 			tf.keras.backend.clear_session()
 
 		logging.info(f"Total data ingested: {ingested_counts}")
+		break
