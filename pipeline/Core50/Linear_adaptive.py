@@ -181,7 +181,7 @@ if __name__ == "__main__":
 	Path(model_save_path).mkdir(parents = False, exist_ok = False)
 
 	expert_ensemble.fallback_expert.trained_model.model.save(os.path.join(model_save_path, "fallback_model.keras"))
-	with open(os.path.join(model_save_pathh, "fallback_router.pkl"), "wb") as f:
+	with open(os.path.join(model_save_path, "fallback_router.pkl"), "wb") as f:
 		pickle.dumps(expert_ensemble.fallback_expert.router, f)
 
 	for indx, each_expert in enumerate(expert_ensemble.experts):
