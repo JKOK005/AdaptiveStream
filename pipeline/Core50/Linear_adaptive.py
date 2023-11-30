@@ -181,10 +181,10 @@ if __name__ == "__main__":
 
 	expert_ensemble.fallback_expert.trained_model.model.save_weights(os.path.join(model_save_path, "fallback_model.h5"))
 	with open(os.path.join(model_save_path, "fallback_router.pkl"), "wb") as f:
-		pickle.dumps(expert_ensemble.fallback_expert.router, f)
+		pickle.dump(expert_ensemble.fallback_expert.router, f)
 
 	for indx, each_expert in enumerate(expert_ensemble.experts):
 		each_expert.trained_model.model.save_weights(os.path.join(model_save_path, f"{indx}_model.h5"))
 		
 		with open(os.path.join(model_save_path, f"{indx}_router.pkl"), "wb") as f:
-			pickle.dumps(each_expert.router, f)
+			pickle.dump(each_expert.router, f)
