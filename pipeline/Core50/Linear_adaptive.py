@@ -155,10 +155,10 @@ if __name__ == "__main__":
 
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 		np.random.shuffle(train_dat)
-		train_dat   = train_dat
+		train_dat   = train_dat[0:100]
 		ingested_counts  = 0
 
-		for each_training_dat in tqdm(np.array_split(train_dat, 2)):
+		for each_training_dat in tqdm(np.array_split(train_dat, 4)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
@@ -166,10 +166,18 @@ if __name__ == "__main__":
 			expert_ensemble.ingest(batch_input = (feats_as_tensor, labels_as_tensor))
 			ingested_counts += len(feats_as_tensor)
 			tf.keras.backend.clear_session()
-			break
 
 		logging.info(f"Total data ingested: {ingested_counts}")
-		break
 
-	import IPython
-	IPython.embed()
+	import pickle
+	expert_ensemble.fallback_expert.trained_model.model.save(os.path.join(args.save_path, "fallback_model.keras"))
+	with open(os.path.join(args.save_path, "fallback_router.pkl"), "wb") as f:
+		pickle.dumps(expert_ensemble.fallback_expert.router, f)
+
+	for indx, each_expert in enumerate(expert_ensemble.experts):
+		each_expert.trained_model.model.save(os.path.join(args.save_path, f"{indx}_model.keras"))
+		
+		with open(os.path.join(args.save_path, f"{indx}_router.pkl"), "wb") as f:
+			pickle.dumps(each_expert.router, f)
+
+
