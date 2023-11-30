@@ -167,6 +167,8 @@ if __name__ == "__main__":
 			ingested_counts += len(feats_as_tensor)
 			tf.keras.backend.clear_session()
 
+		break
+
 		logging.info(f"Total data ingested: {ingested_counts}")
 
 	import pickle
