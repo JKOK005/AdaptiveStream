@@ -173,15 +173,19 @@ if __name__ == "__main__":
 
 	import pickle
 	import os 
-	
-	expert_ensemble.fallback_expert.trained_model.model.save(os.path.join(args.save_path, "fallback_model.keras"))
-	with open(os.path.join(args.save_path, "fallback_router.pkl"), "wb") as f:
+	import time
+	from pathlib import Path
+
+	current_time_round_up 	= int(time.time())
+	model_save_path 		= os.path.join(args.save_path, str(current_time_round_up))
+	Path(model_save_path).mkdir(parents = False, exist_ok = False)
+
+	expert_ensemble.fallback_expert.trained_model.model.save(os.path.join(model_save_path, "fallback_model.keras"))
+	with open(os.path.join(model_save_pathh, "fallback_router.pkl"), "wb") as f:
 		pickle.dumps(expert_ensemble.fallback_expert.router, f)
 
 	for indx, each_expert in enumerate(expert_ensemble.experts):
-		each_expert.trained_model.model.save(os.path.join(args.save_path, f"{indx}_model.keras"))
+		each_expert.trained_model.model.save(os.path.join(model_save_path, f"{indx}_model.keras"))
 		
-		with open(os.path.join(args.save_path, f"{indx}_router.pkl"), "wb") as f:
+		with open(os.path.join(model_save_path, f"{indx}_router.pkl"), "wb") as f:
 			pickle.dumps(each_expert.router, f)
-
-
