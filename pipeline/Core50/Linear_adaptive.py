@@ -166,6 +166,10 @@ if __name__ == "__main__":
 			expert_ensemble.ingest(batch_input = (feats_as_tensor, labels_as_tensor))
 			ingested_counts += len(feats_as_tensor)
 			tf.keras.backend.clear_session()
+			break
 
 		logging.info(f"Total data ingested: {ingested_counts}")
 		break
+
+	import IPython
+	IPython.embed()
