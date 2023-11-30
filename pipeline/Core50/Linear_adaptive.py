@@ -172,6 +172,8 @@ if __name__ == "__main__":
 		logging.info(f"Total data ingested: {ingested_counts}")
 
 	import pickle
+	import os 
+	
 	expert_ensemble.fallback_expert.trained_model.model.save(os.path.join(args.save_path, "fallback_model.keras"))
 	with open(os.path.join(args.save_path, "fallback_router.pkl"), "wb") as f:
 		pickle.dumps(expert_ensemble.fallback_expert.router, f)
