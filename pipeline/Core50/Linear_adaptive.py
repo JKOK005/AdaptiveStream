@@ -55,7 +55,7 @@ def build_router(input_shape: (int), latent_dim: int):
 		},
 
 		training_params = {
-			"epochs" 		: 20, 
+			"epochs" 		: 30, 
 			"batch_size" 	: 32,
 			"verbose" 		: False,
 		}, 
@@ -120,7 +120,7 @@ if __name__ == "__main__":
 	base_model 	 	= 	build_net()
 
 	optimizer 		= 	tf.keras.optimizers.legacy.Adam(
-							learning_rate = 0.0001,
+							learning_rate = 0.000075,
 						)
 
 	loss_fn 		=  	tf.keras.losses.SparseCategoricalCrossentropy(
@@ -132,7 +132,7 @@ if __name__ == "__main__":
 							optimizer 		= optimizer,
 							loss_fn 		= loss_fn,
 							training_params = {
-								"epochs" : 20,
+								"epochs" : 30,
 							}, 
 							training_batch_size = 32,
 						)
