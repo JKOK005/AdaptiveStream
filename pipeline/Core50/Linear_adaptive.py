@@ -1,7 +1,11 @@
 import argparse
 import logging
 import glob
+import os 
 import tensorflow as tf
+import time
+import pickle
+from pathlib import Path
 from adaptivestream.Buffer import LabelledFeatureBuffer
 from adaptivestream.Models import ExpertEnsemble
 from adaptivestream.Models.Router import OutlierAERouter
@@ -69,6 +73,21 @@ def build_drift_feature_extractor(input_shape: (int), latent_dim: int):
 		Dense(units = latent_dim),
 	])
 	return encoder_net
+
+def save(expert_emsemble, save_path):
+	current_time_round_up 	= int(time.time())
+	model_save_path 		= os.path.join(save_path, str(current_time_round_up))
+	Path(model_save_path).mkdir(parents = False, exist_ok = False)
+
+	expert_ensemble.fallback_expert.trained_model.model.save_weights(os.path.join(model_save_path, "fallback_model.h5"))
+	with open(os.path.join(model_save_path, "fallback_router.pkl"), "wb") as f:
+		pickle.dump(expert_ensemble.fallback_expert.router, f)
+
+	for indx, each_expert in enumerate(expert_ensemble.experts):
+		each_expert.trained_model.model.save_weights(os.path.join(model_save_path, f"{indx}_model.h5"))
+		
+		with open(os.path.join(model_save_path, f"{indx}_router.pkl"), "wb") as f:
+			pickle.dump(each_expert.router, f)
 
 if __name__ == "__main__":
 	parser 		= argparse.ArgumentParser(description='Linear AdaptiveStream training on Core50')
@@ -167,23 +186,7 @@ if __name__ == "__main__":
 			ingested_counts += len(feats_as_tensor)
 			tf.keras.backend.clear_session()
 
+		save(expert_emsemble = expert_ensemble, save_path = args.save_path)
 		logging.info(f"Total data ingested: {ingested_counts}")
 
-	import pickle
-	import os 
-	import time
-	from pathlib import Path
-
-	current_time_round_up 	= int(time.time())
-	model_save_path 		= os.path.join(args.save_path, str(current_time_round_up))
-	Path(model_save_path).mkdir(parents = False, exist_ok = False)
-
-	expert_ensemble.fallback_expert.trained_model.model.save_weights(os.path.join(model_save_path, "fallback_model.h5"))
-	with open(os.path.join(model_save_path, "fallback_router.pkl"), "wb") as f:
-		pickle.dump(expert_ensemble.fallback_expert.router, f)
-
-	for indx, each_expert in enumerate(expert_ensemble.experts):
-		each_expert.trained_model.model.save_weights(os.path.join(model_save_path, f"{indx}_model.h5"))
-		
-		with open(os.path.join(model_save_path, f"{indx}_router.pkl"), "wb") as f:
-			pickle.dump(each_expert.router, f)
+	
