@@ -55,7 +55,7 @@ def build_router(input_shape: (int), latent_dim: int):
 		},
 
 		training_params = {
-			"epochs" 		: 2, 
+			"epochs" 		: 30, 
 			"batch_size" 	: 32,
 			"verbose" 		: False,
 		}, 
@@ -132,7 +132,7 @@ if __name__ == "__main__":
 							optimizer 		= optimizer,
 							loss_fn 		= loss_fn,
 							training_params = {
-								"epochs" : 2,
+								"epochs" : 30,
 							}, 
 							training_batch_size = 32,
 						)
