@@ -18,7 +18,7 @@ from tqdm import tqdm
 """
 python3 pipeline/Core50/Linear_adaptive_test.py \
 --net vgg \
---train_dir checkpoint/core50/vgg/linear/1701445892 \
+--train_dir checkpoint/core50/vgg/linear/170144307 \
 --test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test
 """
 
@@ -78,8 +78,8 @@ if __name__ == "__main__":
 		logging.info(f"Reading: {each_file}")
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 
-		feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
-		labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
+		feats_as_tensor   = tf.convert_to_tensor(train_dat[:,0].tolist(), dtype = tf.float32)
+		labels_as_tensor  = tf.convert_to_tensor(train_dat[:,1].tolist(), dtype = tf.float32)
 		labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
 
 		pred 		= expert_ensemble.infer(input_data = feats_as_tensor)
