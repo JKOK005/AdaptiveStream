@@ -18,7 +18,7 @@ from tqdm import tqdm
 """
 python3 pipeline/Core50/Linear_adaptive_test.py \
 --net vgg \
---train_dir checkpoint/core50/vgg/linear/1701443071 \
+--train_dir checkpoint/core50/vgg/linear/1701443998 \
 --test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test
 """
 
@@ -81,6 +81,7 @@ if __name__ == "__main__":
 	expert_ensemble = load_model(path = args.train_dir, net = args.net)
 
 	loss_fn 	= tf.keras.metrics.sparse_categorical_accuracy
+	batch_acc 	= []
 
 	for each_file in sorted(glob.glob(f"{args.test_dir}/*.npy")):
 		logging.info(f"Reading: {each_file}")
@@ -92,6 +93,11 @@ if __name__ == "__main__":
 		pred = expert_ensemble.infer(input_data = feats_as_tensor)
 		correct_guesses = loss_fn(labels_as_tensor, pred)
 		acc = sum(correct_guesses) / len(correct_guesses)
+		batch_acc.append(acc)
+
+		import IPython
+		IPython.embed()
+
 		logging.info(f"File: {each_file}, Accuracy: {acc}")
 
 	
