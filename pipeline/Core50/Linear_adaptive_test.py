@@ -95,9 +95,4 @@ if __name__ == "__main__":
 		acc = sum(correct_guesses) / len(correct_guesses)
 		batch_acc.append(acc)
 
-		import IPython
-		IPython.embed()
-
 		logging.info(f"File: {each_file}, Accuracy: {acc}")
-
-	
