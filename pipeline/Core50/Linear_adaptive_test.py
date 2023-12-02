@@ -38,7 +38,7 @@ def load_model(path: str, net: str):
 		name = each_weight_file.split("/")[-1].replace("_model.h5", "")
 
 		if net == "vgg":
-			model = build_vgg_net()
+			base_model = build_vgg_net()
 
 		weight_path = os.path.join(path, f"{name}_model.h5")
 		router_path = os.path.join(path, f"{name}_router.pkl")
@@ -49,8 +49,16 @@ def load_model(path: str, net: str):
 		with open(router_path, "rb") as f:
 			router = pickle.load(f)
 
+		model_wrapper 	= 	SupervisedModelWrapper(
+							base_model 		= base_model,
+							optimizer 		= None,
+							loss_fn 		= None,
+							training_params = None, 
+							training_batch_size = None,
+						)
+
 		expert 	= Expert(
-					trained_model = model,
+					trained_model = model_wrapper,
 					router = router
 				)
 
