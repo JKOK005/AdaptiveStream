@@ -9,13 +9,15 @@ from adaptivestream.Models import ExpertEnsemble, Expert
 from adaptivestream.Models.Router import OutlierAERouter
 from adaptivestream.Models.Wrapper import SupervisedModelWrapper
 from adaptivestream.Models.Net import VggNet16Factory
-from adaptivestream.Rules.Scaling import OnlineMMDDrift, BufferSizeLimit
+from adaptivestream.Rules.Scaling import OnlineMMDDrift
+from adaptivestream.Policies.Scaling import NaiveScaling
+from adaptivestream.Policies.Compaction import NoCompaction
 from tqdm import tqdm
 
 """
 python3 pipeline/Core50/Linear_adaptive_test.py \
 --net vgg \
---load_path checkpoint/core50/vgg/linear \
+--train_dir checkpoint/core50/vgg/linear/1701445892 \
 --test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test
 """
 
@@ -26,9 +28,9 @@ def load_model(path: str, net: str):
 	dummy_expert_ensemble = ExpertEnsemble(
 								buffer = None,
 								scaling_rules = None,
-								scaling_policy = None,
+								scaling_policy = NaiveScaling(model = None, router = None),
 								compaction_rules = None, 
-								compaction_policy = None
+								compaction_policy = NoCompaction(),
 							)
 
 	for each_weight_file in sorted(glob.glob(f"{path}/*.h5")):
