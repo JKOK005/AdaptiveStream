@@ -45,17 +45,17 @@ def load_model(path: str, net: str):
 
 		logging.info(f"Weights: {weight_path}, Router: {router_path}")
 
-		model.load_weights(weight_path)
+		base_model.load_weights(weight_path)
 		with open(router_path, "rb") as f:
 			router = pickle.load(f)
 
 		model_wrapper 	= 	SupervisedModelWrapper(
-							base_model 		= base_model,
-							optimizer 		= None,
-							loss_fn 		= None,
-							training_params = None, 
-							training_batch_size = None,
-						)
+								base_model 		= base_model,
+								optimizer 		= None,
+								loss_fn 		= None,
+								training_params = None, 
+								training_batch_size = None,
+							)
 
 		expert 	= Expert(
 					trained_model = model_wrapper,
