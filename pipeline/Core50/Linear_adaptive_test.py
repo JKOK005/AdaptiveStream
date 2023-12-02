@@ -46,7 +46,7 @@ def load_model(path: str, net: str):
 
 		model.load_weights(weight_path)
 		with open(router_path, "r") as f:
-			router = pickle.load(f)
+			router = pickle.loads(f)
 
 		expert 	= Expert(
 					trained_model = model,
