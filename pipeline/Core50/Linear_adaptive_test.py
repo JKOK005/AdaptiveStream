@@ -13,7 +13,7 @@ from adaptivestream.Rules.Scaling import OnlineMMDDrift, BufferSizeLimit
 from tqdm import tqdm
 
 """
-python3 pipeline/Core50/Linear_adaptive.py \
+python3 pipeline/Core50/Linear_adaptive_test.py \
 --net vgg \
 --load_path checkpoint/core50/vgg/linear \
 --test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test
@@ -63,7 +63,6 @@ if __name__ == "__main__":
 	parser.add_argument('--net', type = str, nargs = '?', help = 'Network name')
 	parser.add_argument('--train_dir', type = str, nargs = '?', help = 'Path to train features')
 	parser.add_argument('--test_dir', type = str, nargs = '?', help = 'Path to train features')
-	parser.add_argument('--save_path', type = str, nargs = '?', help = 'Model checkpoint path')
 	args 		= parser.parse_args()
 
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
