@@ -1,6 +1,7 @@
 import argparse
 import logging
 import glob
+import numpy as np
 import os 
 import tensorflow as tf
 import pickle
