@@ -123,6 +123,8 @@ class ExpertEnsemble(object):
 		else:
 			# No experts achieve at least 25% confidence in infering current batch
 			best_expert = self.fallback_expert
+
+		print(probs)
 		return best_expert.infer(input_data)
 
 	def infer_w_smpls(self, input_data,
