@@ -34,7 +34,7 @@ def load_model(path: str, net: str):
 							)
 
 	for each_weight_file in sorted(glob.glob(f"{path}/*.h5")):
-		name = each_weight_file.split("/")[-1].replace(".h5", "")
+		name = each_weight_file.split("/")[-1].replace("_model.h5", "")
 
 		if net == "vgg":
 			model = build_vgg_net()
