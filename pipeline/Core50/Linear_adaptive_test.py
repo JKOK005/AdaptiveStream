@@ -18,7 +18,7 @@ from tqdm import tqdm
 """
 python3 pipeline/Core50/Linear_adaptive_test.py \
 --net vgg \
---train_dir checkpoint/core50/vgg/linear/170144307 \
+--train_dir checkpoint/core50/vgg/linear/1701443071 \
 --test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test
 """
 
@@ -54,7 +54,7 @@ def load_model(path: str, net: str):
 					router = router
 				)
 
-		if name == "fallback_model":
+		if name == "fallback":
 			dummy_expert_ensemble.fallback_expert = expert
 
 		else:
