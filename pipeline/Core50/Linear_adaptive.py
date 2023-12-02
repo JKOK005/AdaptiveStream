@@ -84,9 +84,9 @@ def save(expert_emsemble, save_path):
 		pickle.dump(expert_ensemble.fallback_expert.router, f)
 
 	for indx, each_expert in enumerate(expert_ensemble.experts):
-		each_expert.trained_model.model.save_weights(os.path.join(model_save_path, f"{indx}_model.h5"))
+		each_expert.trained_model.model.save_weights(os.path.join(model_save_path, "{:02d}_model.h5".format(indx)))
 		
-		with open(os.path.join(model_save_path, f"{indx}_router.pkl"), "wb") as f:
+		with open(os.path.join(model_save_path, "{:02d}_router.pkl".format(indx)), "wb") as f:
 			pickle.dump(each_expert.router, f)
 
 if __name__ == "__main__":
