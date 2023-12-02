@@ -89,12 +89,9 @@ if __name__ == "__main__":
 		feats_as_tensor   = tf.convert_to_tensor(train_dat[:,0].tolist(), dtype = tf.float32)
 		labels_as_tensor  = tf.convert_to_tensor(train_dat[:,1].tolist(), dtype = tf.float32)
 
-		pred 		= expert_ensemble.infer(input_data = feats_as_tensor)
-
-		import IPython
-		IPython.embed()
-
-		acc 		= loss_fn(labels_as_tensor, pred)
+		pred = expert_ensemble.infer(input_data = feats_as_tensor)
+		correct_guesses = loss_fn(labels_as_tensor, pred)
+		acc = sum(correct_guesses) / len(correct_guesses)
 		logging.info(f"File: {each_file}, Accuracy: {acc}")
 
 	
