@@ -88,9 +88,12 @@ if __name__ == "__main__":
 
 		feats_as_tensor   = tf.convert_to_tensor(train_dat[:,0].tolist(), dtype = tf.float32)
 		labels_as_tensor  = tf.convert_to_tensor(train_dat[:,1].tolist(), dtype = tf.float32)
-		labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
 
 		pred 		= expert_ensemble.infer(input_data = feats_as_tensor)
+
+		import IPython
+		IPython.embed()
+
 		acc 		= loss_fn(labels_as_tensor, pred)
 		logging.info(f"File: {each_file}, Accuracy: {acc}")
 
