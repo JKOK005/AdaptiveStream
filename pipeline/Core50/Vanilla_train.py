@@ -59,5 +59,6 @@ if __name__ == "__main__":
 
 			model.compile(optimizer = optimizer, loss = loss_fn)
 			model.fit(x = dataset, epochs = 30)
-			
+			break
+
 		save(model = model, save_path = args.save_path)
