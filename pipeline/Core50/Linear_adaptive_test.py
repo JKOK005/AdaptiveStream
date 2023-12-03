@@ -18,7 +18,7 @@ from tqdm import tqdm
 """
 python3 pipeline/Core50/Linear_adaptive_test.py \
 --net vgg \
---train_dir checkpoint/core50/vgg/linear/1701443998 \
+--train_dir checkpoint/core50/vgg/linear/1701444941 \
 --test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test \
 --alpha 0.1
 """
