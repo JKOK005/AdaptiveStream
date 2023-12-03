@@ -5,6 +5,7 @@ import os
 import tensorflow as tf
 import time
 import pickle
+from adaptivestream.Models.Net import VggNet16Factory
 from pathlib import Path
 from Examples.Math.index_tree_creation import *
 from tensorflow.keras import Sequential
@@ -14,32 +15,15 @@ from tqdm import tqdm
 """
 python3 pipeline/Core50/Vanilla_train.py \
 --train_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/train \
---test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test \
 --save_path checkpoint/core50/vgg/linear
 """
 
 def build_net():
 	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
-def save(expert_emsemble, save_path):
-	current_time_round_up 	= int(time.time())
-	model_save_path 		= os.path.join(save_path, str(current_time_round_up))
-	Path(model_save_path).mkdir(parents = False, exist_ok = False)
-
-	expert_ensemble.fallback_expert.trained_model.model.save_weights(os.path.join(model_save_path, "fallback_model.h5"))
-	with open(os.path.join(model_save_path, "fallback_router.pkl"), "wb") as f:
-		pickle.dump(expert_ensemble.fallback_expert.router, f)
-
-	for indx, each_expert in enumerate(expert_ensemble.experts):
-		each_expert.trained_model.model.save_weights(os.path.join(model_save_path, "{:02d}_model.h5".format(indx)))
-		
-		with open(os.path.join(model_save_path, "{:02d}_router.pkl".format(indx)), "wb") as f:
-			pickle.dump(each_expert.router, f)
-
 if __name__ == "__main__":
 	parser 		= argparse.ArgumentParser(description='Linear AdaptiveStream training on Core50')
 	parser.add_argument('--train_dir', type = str, nargs = '?', help = 'Path to train features')
-	parser.add_argument('--test_dir', type = str, nargs = '?', help = 'Path to train features')
 	parser.add_argument('--save_path', type = str, nargs = '?', help = 'Model checkpoint path')
 	args 		= parser.parse_args()
 
