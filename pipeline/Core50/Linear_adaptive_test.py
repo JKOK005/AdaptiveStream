@@ -91,24 +91,25 @@ if __name__ == "__main__":
 		logging.info(f"Reading: {each_file}")
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 
-		feats_as_tensor   = tf.convert_to_tensor(train_dat[:,0].tolist(), dtype = tf.float32)
-		labels_as_tensor  = tf.convert_to_tensor(train_dat[:,1].tolist(), dtype = tf.float32)
+		for each_training_dat in tqdm(np.array_split(train_dat, 3)):
+			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
+			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 
-		row_count = feats_as_tensor.shape[0]
-		row_smpls = int(row_count * 0.1)
+			row_count = feats_as_tensor.shape[0]
+			row_smpls = int(row_count * 0.1)
 
-		feats_smpl 	= feats_as_tensor[:row_smpls, :]
-		labels_smpl = labels_as_tensor[:row_smpls]
+			feats_smpl 	= feats_as_tensor[:row_smpls, :]
+			labels_smpl = labels_as_tensor[:row_smpls]
 
-		pred = expert_ensemble.infer_w_smpls(
-									input_data = feats_as_tensor, 
-									truth_smpls = (feats_smpl, labels_smpl), 
-									alpha = args.alpha
-								)
+			pred = expert_ensemble.infer_w_smpls(
+										input_data = feats_as_tensor, 
+										truth_smpls = (feats_smpl, labels_smpl), 
+										alpha = args.alpha
+									)
 
-		correct_guesses = loss_fn(labels_as_tensor, pred)
-		acc = sum(correct_guesses) / len(correct_guesses)
-		batch_acc.append(acc)
+			correct_guesses = loss_fn(labels_as_tensor, pred)
+			acc = sum(correct_guesses) / len(correct_guesses)
+			batch_acc.append(acc)
+			logging.info(f"File: {each_file}, Accuracy: {acc}")
 
-		logging.info(f"File: {each_file}, Accuracy: {acc}")
 	logging.info(f"Average accuracy: {np.mean(batch_acc)}")
