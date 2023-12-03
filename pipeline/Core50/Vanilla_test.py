@@ -14,7 +14,7 @@ from tqdm import tqdm
 """
 python3 pipeline/Core50/Vanilla_test.py \
 --net vgg \
---train_path checkpoint/core50/vgg/vanilla/1701585269_vanilla.h5 \
+--train_path checkpoint/core50/vgg/vanilla/1701584127_vanilla.h5 \
 --test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test
 """
 
