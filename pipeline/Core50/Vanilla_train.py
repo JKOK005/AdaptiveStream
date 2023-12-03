@@ -53,6 +53,6 @@ if __name__ == "__main__":
 			dataset = tf.data.Dataset.from_tensor_slices((feats_as_tensor, labels_as_tensor)) \
 									 .batch(32)
 
-			self.model.compile(optimizer = optimizer, loss = loss_fn)
-			self.model.fit(x = dataset, epochs = 30)
+			model.compile(optimizer = optimizer, loss = loss_fn)
+			model.fit(x = dataset, epochs = 30)
 	
