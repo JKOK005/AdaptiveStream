@@ -49,7 +49,7 @@ if __name__ == "__main__":
 		feats_as_tensor   = tf.convert_to_tensor(train_dat[:,0].tolist(), dtype = tf.float32)
 		labels_as_tensor  = tf.convert_to_tensor(train_dat[:,1].tolist(), dtype = tf.float32)
 
-		pred = 	base_model(feats_as_tensor)
+		pred = 	model(feats_as_tensor)
 
 		correct_guesses = loss_fn(labels_as_tensor, pred)
 		acc = sum(correct_guesses) / len(correct_guesses)
