@@ -14,11 +14,11 @@ from tqdm import tqdm
 """
 python3 pipeline/Core50/Vanilla_test.py \
 --net vgg \
---train_path checkpoint/core50/vgg/linear/1701444941 \
+--train_path checkpoint/core50/vgg/vanilla/1701585269_vanilla.h5 \
 --test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test
 """
 
-def build_net():
+def build_vgg_net():
 	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
 def load_model(path: str, net: str):
