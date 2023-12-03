@@ -19,7 +19,8 @@ from tqdm import tqdm
 python3 pipeline/Core50/Linear_adaptive_test.py \
 --net vgg \
 --train_dir checkpoint/core50/vgg/linear/1701443998 \
---test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test
+--test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test \
+--alpha 0.1
 """
 
 def build_vgg_net():
@@ -74,6 +75,7 @@ if __name__ == "__main__":
 	parser.add_argument('--net', type = str, nargs = '?', help = 'Network name')
 	parser.add_argument('--train_dir', type = str, nargs = '?', help = 'Path to train features')
 	parser.add_argument('--test_dir', type = str, nargs = '?', help = 'Path to train features')
+	parser.add_argument('--alpha', type = float, nargs = '?', help = 'Weighted ratio of using outlier loss to sample loss')
 	args 		= parser.parse_args()
 
 	logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -90,9 +92,21 @@ if __name__ == "__main__":
 		feats_as_tensor   = tf.convert_to_tensor(train_dat[:,0].tolist(), dtype = tf.float32)
 		labels_as_tensor  = tf.convert_to_tensor(train_dat[:,1].tolist(), dtype = tf.float32)
 
-		pred = expert_ensemble.infer(input_data = feats_as_tensor)
+		row_count = feats_as_tensor.shape[0]
+		row_smpls = int(row_count * 0.1)
+
+		feats_smpl 	= feats_as_tensor[:row_smpls, :]
+		labels_smpl = labels_as_tensor[:row_smpls]
+
+		pred = expert_ensemble.infer_w_smpls(
+									input_data = feats_as_tensor, 
+									truth_smpls = (feats_smpl, labels_smpl), 
+									alpha = args.alpha
+								)
+
 		correct_guesses = loss_fn(labels_as_tensor, pred)
 		acc = sum(correct_guesses) / len(correct_guesses)
 		batch_acc.append(acc)
 
 		logging.info(f"File: {each_file}, Accuracy: {acc}")
+	logging.info(f"Average accuracy: {np.mean(batch_acc)}")
