@@ -51,9 +51,11 @@ def load_model(path: str, net: str):
 			router = pickle.load(f)
 
 		model_wrapper 	= 	SupervisedModelWrapper(
-								base_model 		= base_model,
-								optimizer 		= None,
-								loss_fn 		= None,
+								base_model = base_model,
+								optimizer = None,
+								loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(
+											reduction = tf.keras.losses.Reduction.SUM
+										),
 								training_params = None, 
 								training_batch_size = None,
 							)
