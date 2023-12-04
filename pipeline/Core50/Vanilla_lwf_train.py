@@ -14,7 +14,7 @@ from tqdm import tqdm
 """
 python3 pipeline/Core50/Vanilla_lwf_train.py \
 --train_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/train \
---save_path checkpoint/core50/vgg/vanilla_lwf
+--save_path checkpoint/core50/vgg/vanilla_lwf/alpha_0.1
 """
 
 def build_net():
@@ -26,11 +26,11 @@ def save(model, save_path):
 	return
 
 class LwfLoss(tf.keras.losses.Loss):
-	cur_loss = 	tf.keras.losses.SparseCategoricalCrossentropy(
+	cur_loss 	= tf.keras.losses.SparseCategoricalCrossentropy(
 					reduction = tf.keras.losses.Reduction.SUM
 				)
 
-	prior_loss = tf.keras.losses.KLDivergence(
+	prior_loss 	= tf.keras.losses.KLDivergence(
 					reduction = tf.keras.losses.Reduction.SUM
 				)
 
@@ -39,7 +39,7 @@ class LwfLoss(tf.keras.losses.Loss):
 						*args, **kwargs):
 		super(LwfLoss, self).__init__(*args, **kwargs)
 		self.prior_y_pred 	= None 
-		self.tmp 			= 1 
+		self.tmp 			= 1.1
 		self.lwf_alpha 		= 0.1
 		self.tmp 			= tmp
 		self.lwf_alpha 		= lwf_alpha
