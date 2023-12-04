@@ -26,6 +26,15 @@ def save(model, save_path):
 	return
 
 class LwfLoss(tf.keras.losses.Loss):
+	cur_loss = 	tf.keras.losses.SparseCategoricalCrossentropy(
+					reduction = tf.keras.losses.Reduction.SUM
+				)
+
+	prior_loss = tf.keras.losses.KLDivergence(
+					reduction = tf.keras.losses.Reduction.SUM
+				)
+
+
 	def __init__(self, 	tmp: float, lwf_alpha: float, 
 						*args, **kwargs):
 		super(LwfLoss, self).__init__(*args, **kwargs)
@@ -40,11 +49,14 @@ class LwfLoss(tf.keras.losses.Loss):
 		if self.prior_y_pred is None:
 			self.prior_y_pred = y_pred
 
-		cur_loss 	= tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred)
-		prior_loss 	= tf.keras.losses.kullback_leibler_divergence(self.prior_y_pred, y_pred)
+		# cur_loss 	= tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred)
+		# prior_loss 	= tf.keras.losses.kullback_leibler_divergence(self.prior_y_pred, y_pred)
 
-		lwf_loss = 	(1 - self.lwf_alpha) * cur_loss + \
-					(self.lwf_alpha * (self.tmp ** 2)) * prior_loss
+		_cur_loss 	= self.cur_loss(y_true, y_pred)
+		_prior_loss = self.prior_loss(self.prior_y_pred, y_pred)
+
+		lwf_loss = 	(1 - self.lwf_alpha) * _cur_loss + \
+					(self.lwf_alpha * (self.tmp ** 2)) * _prior_loss
 
 		self.prior_y_pred = tf.get_static_value(y_pred)
 		return lwf_loss
@@ -72,7 +84,7 @@ if __name__ == "__main__":
 		np.random.shuffle(train_dat)
 		train_dat   = train_dat
 
-		for each_training_dat in tqdm(np.array_split(train_dat, 10)):
+		for each_training_dat in tqdm(np.array_split(train_dat, 2)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 
