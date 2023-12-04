@@ -53,8 +53,8 @@ class LwfLoss(tf.keras.losses.Loss):
 		cur_loss 	= self.cur_loss(y_true, y_pred)
 		prior_loss 	= self.prior_loss(self.prior_y_pred, y_pred)
 
-		lwf_loss = 	(1 - lwf_alpha) * cur_loss + \
-					(lwf_alpha * (self.tmp ** 2)) * prior_loss
+		lwf_loss = 	(1 - self.lwf_alpha) * cur_loss + \
+					(self.lwf_alpha * (self.tmp ** 2)) * prior_loss
 
 		self.prior_y_pred = y_pred
 		print(f"Current loss: {cur_loss}, Prior loss: {prior_loss}")
