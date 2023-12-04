@@ -29,15 +29,6 @@ class LwfLoss(tf.keras.losses.Loss):
 	def __init__(self, 	tmp: float, lwf_alpha: float, 
 						*args, **kwargs):
 		super(LwfLoss, self).__init__(*args, **kwargs)
-
-		self.cur_loss 	= tf.keras.losses.SparseCategoricalCrossentropy(
-					reduction = tf.keras.losses.Reduction.SUM
-				)
-
-		self.prior_loss = tf.keras.losses.KLDivergence(
-					    reduction = tf.keras.losses.Reduction.SUM
-					)
-
 		self.prior_y_pred 	= None 
 		self.tmp 			= 1 
 		self.lwf_alpha 		= 0.1
@@ -49,10 +40,8 @@ class LwfLoss(tf.keras.losses.Loss):
 		if self.prior_y_pred is None:
 			self.prior_y_pred = y_pred
 
-		print(self.cur_loss(y_true, y_pred))
-
-		cur_loss 	= self.cur_loss(y_true, y_pred)
-		prior_loss 	= self.prior_loss(self.prior_y_pred, y_pred)
+		cur_loss 	= tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred)
+		prior_loss 	= 0
 
 		lwf_loss = 	(1 - self.lwf_alpha) * cur_loss + \
 					(self.lwf_alpha * (self.tmp ** 2)) * prior_loss
