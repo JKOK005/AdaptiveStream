@@ -1,4 +1,4 @@
- import argparse
+import argparse
 import logging
 import glob
 import os 
@@ -12,9 +12,9 @@ from tensorflow.keras.layers import Dense, Input, Flatten, Conv2D, Conv2DTranspo
 from tqdm import tqdm
 
 """
-python3 pipeline/Core50/Vanilla_train.py \
+python3 pipeline/Core50/Vanilla_lwf_train.py \
 --train_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/train \
---save_path checkpoint/core50/vgg/vanilla
+--save_path checkpoint/core50/vgg/vanilla_lwf
 """
 
 def build_net():
