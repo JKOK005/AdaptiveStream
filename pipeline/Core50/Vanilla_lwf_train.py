@@ -40,7 +40,7 @@ class LwfLoss(tf.keras.losses.Loss):
 		super(LwfLoss, self).__init__(*args, **kwargs)
 		self.prior_y_pred 	= None 
 		self.tmp 			= 1.1
-		self.lwf_alpha 		= 0.1
+		self.lwf_alpha 		= 0.5
 		self.tmp 			= tmp
 		self.lwf_alpha 		= lwf_alpha
 		return
