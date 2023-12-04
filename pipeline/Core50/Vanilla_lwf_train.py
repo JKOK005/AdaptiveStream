@@ -45,8 +45,8 @@ class LwfLoss(tf.keras.losses.Loss):
 
 		lwf_loss = 	(1 - self.lwf_alpha) * cur_loss + \
 					(self.lwf_alpha * (self.tmp ** 2)) * prior_loss
-					
-		self.prior_y_pred = y_pred.numpy()
+
+		self.prior_y_pred = tf.get_static_value(y_pred)
 		return lwf_loss
 
 if __name__ == "__main__":
@@ -72,7 +72,7 @@ if __name__ == "__main__":
 		np.random.shuffle(train_dat)
 		train_dat   = train_dat
 
-		for each_training_dat in tqdm(np.array_split(train_dat, 2)):
+		for each_training_dat in tqdm(np.array_split(train_dat, 10)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 
