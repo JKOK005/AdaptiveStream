@@ -26,7 +26,7 @@ def save(model, save_path):
 	return
 
 class LwfLoss(tf.keras.losses.Loss):
-	cur_loss 	= 	tf.keras.losses.SparseCategoricalCrossentropy(
+	cur_loss 	= tf.keras.losses.SparseCategoricalCrossentropy(
 					reduction = tf.keras.losses.Reduction.SUM
 				)
 
@@ -55,6 +55,9 @@ class LwfLoss(tf.keras.losses.Loss):
 
 		lwf_loss = 	(1 - self.lwf_alpha) * cur_loss + \
 					(self.lwf_alpha * (self.tmp ** 2)) * prior_loss
+
+		import IPython
+		IPython.embed()
 
 		self.prior_y_pred = y_pred
 		print(f"Current loss: {cur_loss}, Prior loss: {prior_loss}")
