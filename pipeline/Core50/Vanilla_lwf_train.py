@@ -50,10 +50,14 @@ class LwfLoss(tf.keras.losses.Loss):
 		if self.prior_y_pred is None:
 			self.prior_y_pred = y_pred
 
-		lwf_loss = 	(1 - lwf_alpha) * self.cur_loss(y_true, y_pred) + \
-					(lwf_alpha * (self.tmp ** 2)) * self.prior_loss(self.prior_y_pred, y_pred)
+		cur_loss 	= self.cur_loss(y_true, y_pred)
+		prior_loss 	= self.prior_loss(self.prior_y_pred, y_pred)
+
+		lwf_loss = 	(1 - lwf_alpha) * cur_loss + \
+					(lwf_alpha * (self.tmp ** 2)) * prior_loss
 
 		self.prior_y_pred = y_pred
+		print(f"Current loss: {cur_loss}, Prior loss: {prior_loss}")
 		return lwf_loss
 
 if __name__ == "__main__":
