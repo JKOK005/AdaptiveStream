@@ -26,24 +26,23 @@ def save(model, save_path):
 	return
 
 class LwfLoss(tf.keras.losses.Loss):
-	cur_loss 	= tf.keras.losses.SparseCategoricalCrossentropy(
+	def __init__(self, 	tmp: float, lwf_alpha: float, 
+						*args, **kwargs):
+		super(LwfLoss, self).__init__(*args, **kwargs)
+
+		self.cur_loss 	= tf.keras.losses.SparseCategoricalCrossentropy(
 					reduction = tf.keras.losses.Reduction.SUM
 				)
 
-	prior_loss 	= tf.keras.losses.KLDivergence(
-				    reduction = tf.keras.losses.Reduction.SUM
-				)
+		self.prior_loss = tf.keras.losses.KLDivergence(
+					    reduction = tf.keras.losses.Reduction.SUM
+					)
 
-	prior_y_pred = None 
-	tmp = 1 
-	lwf_alpha = 0.1
-
-	def __init__(self, 	tmp: float, lwf_alpha: float, 
-						*args, **kwargs):
-
-		super(LwfLoss, self).__init__(*args, **kwargs)
-		self.tmp = tmp
-		self.lwf_alpha = lwf_alpha
+		self.prior_y_pred 	= None 
+		self.tmp 			= 1 
+		self.lwf_alpha 		= 0.1
+		self.tmp 			= tmp
+		self.lwf_alpha 		= lwf_alpha
 		return
 
 	def call(self, y_true, y_pred):
@@ -55,9 +54,6 @@ class LwfLoss(tf.keras.losses.Loss):
 
 		lwf_loss = 	(1 - self.lwf_alpha) * cur_loss + \
 					(self.lwf_alpha * (self.tmp ** 2)) * prior_loss
-
-		import IPython
-		IPython.embed()
 
 		self.prior_y_pred = y_pred
 		print(f"Current loss: {cur_loss}, Prior loss: {prior_loss}")
