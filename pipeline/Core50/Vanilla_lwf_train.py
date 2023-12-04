@@ -49,6 +49,8 @@ class LwfLoss(tf.keras.losses.Loss):
 		if self.prior_y_pred is None:
 			self.prior_y_pred = y_pred
 
+		print(self.cur_loss(y_true, y_pred))
+
 		cur_loss 	= self.cur_loss(y_true, y_pred)
 		prior_loss 	= self.prior_loss(self.prior_y_pred, y_pred)
 
