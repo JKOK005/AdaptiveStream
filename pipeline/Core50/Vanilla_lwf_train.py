@@ -41,13 +41,14 @@ class LwfLoss(tf.keras.losses.Loss):
 			self.prior_y_pred = y_pred
 
 		cur_loss 	= tf.keras.losses.sparse_categorical_crossentropy(y_true, y_pred)
-		prior_loss 	= 0
+		prior_loss 	= tf.keras.losses.kullback_leibler_divergence(self.prior_y_pred, y_pred)
 
 		lwf_loss = 	(1 - self.lwf_alpha) * cur_loss + \
 					(self.lwf_alpha * (self.tmp ** 2)) * prior_loss
 
+		print(self.prior_y_pred)
+
 		self.prior_y_pred = y_pred
-		print(f"Current loss: {cur_loss}, Prior loss: {prior_loss}")
 		return lwf_loss
 
 if __name__ == "__main__":
