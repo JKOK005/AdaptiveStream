@@ -71,7 +71,7 @@ if __name__ == "__main__":
 						learning_rate = 0.00005,
 					)
 
-	loss_fn 	= LwfLoss(tmp = 1.1, lwf_alpha = 0.7)
+	loss_fn 	= LwfLoss(tmp = 1.1, lwf_alpha = 0.6)
 
 	model 		= build_net()
 
