@@ -5,7 +5,7 @@ import os
 import tensorflow as tf
 import time
 import pickle
-from adaptivestream.Models.Net import VggNet16Factory
+from adaptivestream.Models.Net import VggNet16Factory, CaffeNetFactory
 from Examples.Math.index_tree_creation import *
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Input, Flatten, Conv2D, Conv2DTranspose, Reshape
