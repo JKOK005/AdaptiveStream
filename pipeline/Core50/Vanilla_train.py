@@ -25,6 +25,7 @@ def build_vgg_net():
 def build_caffe_net():
 	logging.info(f"Using CaffeNet")
 	return CaffeNetFactory.get_model(input_shape = (128, 128, 3,), output_size = 10)
+	
 def save(model, save_path):
 	current_time_round_up 	= int(time.time())
 	model.save_weights(os.path.join(save_path, f"{current_time_round_up}_vanilla.h5"))
