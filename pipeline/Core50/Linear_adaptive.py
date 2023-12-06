@@ -127,7 +127,7 @@ if __name__ == "__main__":
 	base_model 	 	= 	build_vgg_net() if args.net == "vgg" else build_caffe_net()
 
 	optimizer 		= 	tf.keras.optimizers.legacy.Adam(
-							learning_rate = 0.001,
+							learning_rate = 0.0001,
 						)
 
 	loss_fn 		=  	tf.keras.losses.SparseCategoricalCrossentropy(
