@@ -20,7 +20,5 @@ class CaffeNetFactory(object):
 					Dropout(0.5),
 					Dense(units = 4096, activation="relu"),
 					Dropout(0.5),
-					Dense(units = 4096, activation="relu"),
-					Dropout(0.5),
 					Dense(units = output_size, activation="softmax"),
 				])

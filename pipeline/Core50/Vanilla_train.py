@@ -5,7 +5,7 @@ import os
 import tensorflow as tf
 import time
 import pickle
-from adaptivestream.Models.Net import VggNet16Factory
+from adaptivestream.Models.Net import VggNet16Factory, CaffeNetFactory
 from Examples.Math.index_tree_creation import *
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Input, Flatten, Conv2D, Conv2DTranspose, Reshape
@@ -13,13 +13,18 @@ from tqdm import tqdm
 
 """
 python3 pipeline/Core50/Vanilla_train.py \
+--net caffe \
 --train_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/train \
---save_path checkpoint/core50/vgg/vanilla
+--save_path checkpoint/core50/caffenet/vanilla
 """
 
-def build_net():
+def build_vgg_net():
+	logging.info(f"Using VGGNet")
 	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
+def build_caffe_net():
+	logging.info(f"Using CaffeNet")
+	return CaffeNetFactory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 def save(model, save_path):
 	current_time_round_up 	= int(time.time())
 	model.save_weights(os.path.join(save_path, f"{current_time_round_up}_vanilla.h5"))
@@ -27,6 +32,7 @@ def save(model, save_path):
 
 if __name__ == "__main__":
 	parser 		= argparse.ArgumentParser(description='Linear AdaptiveStream training on Core50')
+	parser.add_argument('--net', type = str, nargs = '?', help = 'Type of network')
 	parser.add_argument('--train_dir', type = str, nargs = '?', help = 'Path to train features')
 	parser.add_argument('--save_path', type = str, nargs = '?', help = 'Model checkpoint path')
 	args 		= parser.parse_args()
@@ -41,7 +47,7 @@ if __name__ == "__main__":
 						reduction = tf.keras.losses.Reduction.SUM
 					)
 	
-	model 		= build_net()
+	model 		= build_vgg_net() if args.net == "vgg" else build_caffe_net()
 
 	for each_file in sorted(glob.glob(f"{args.train_dir}/*.npy")):
 		logging.info(f"Reading: {each_file}")
