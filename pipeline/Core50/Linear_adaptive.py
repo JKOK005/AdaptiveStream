@@ -28,13 +28,15 @@ python3 pipeline/Core50/Linear_adaptive.py \
 --net caffe \
 --train_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/train \
 --test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test \
---save_path checkpoint/core50/vgg/linear
+--save_path checkpoint/core50/caffenet/linear
 """
 
 def build_vgg_net():
+	logging.info(f"Using VGGNet")
 	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
 def build_caffe_net():
+	logging.info(f"Using CaffeNet")
 	return CaffeNetFactory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
 def build_router(input_shape: (int), latent_dim: int):
@@ -176,7 +178,7 @@ if __name__ == "__main__":
 		train_dat   = train_dat
 		ingested_counts  = 0
 
-		for each_training_dat in tqdm(np.array_split(train_dat, 20)):
+		for each_training_dat in tqdm(np.array_split(train_dat, 2)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])
