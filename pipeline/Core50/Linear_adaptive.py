@@ -10,7 +10,7 @@ from adaptivestream.Buffer import LabelledFeatureBuffer
 from adaptivestream.Models import ExpertEnsemble
 from adaptivestream.Models.Router import OutlierAERouter
 from adaptivestream.Models.Wrapper import SupervisedModelWrapper
-from adaptivestream.Models.Net import VggNet16Factory
+from adaptivestream.Models.Net import VggNet16Factory, CaffeNetFactory
 from adaptivestream.Policies.Compaction import NoCompaction
 from adaptivestream.Policies.Scaling import NaiveScaling, ExpertOnlyScaling
 from adaptivestream.Policies.Checkpoint import DirectoryCheckpoint
@@ -25,13 +25,17 @@ from tqdm import tqdm
 
 """
 python3 pipeline/Core50/Linear_adaptive.py \
+--net caffe \
 --train_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/train \
 --test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test \
 --save_path checkpoint/core50/vgg/linear
 """
 
-def build_net():
+def build_vgg_net():
 	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
+
+def build_caffe_net():
+	return CaffeNetFactory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
 def build_router(input_shape: (int), latent_dim: int):
 	net = Sequential([
@@ -91,6 +95,7 @@ def save(expert_emsemble, save_path):
 
 if __name__ == "__main__":
 	parser 		= argparse.ArgumentParser(description='Linear AdaptiveStream training on Core50')
+	parser.add_argument('--net', type = str, nargs = '?', help = 'Type of network')
 	parser.add_argument('--train_dir', type = str, nargs = '?', help = 'Path to train features')
 	parser.add_argument('--test_dir', type = str, nargs = '?', help = 'Path to train features')
 	parser.add_argument('--save_path', type = str, nargs = '?', help = 'Model checkpoint path')
@@ -117,7 +122,7 @@ if __name__ == "__main__":
 
 	scaling_rules 	= [ BufferSizeLimit(min_size = 1) ]
 
-	base_model 	 	= 	build_net()
+	base_model 	 	= 	build_vgg_net() if args.net == "vgg" else build_caffe_net()
 
 	optimizer 		= 	tf.keras.optimizers.legacy.Adam(
 							learning_rate = 0.00005,
@@ -144,17 +149,11 @@ if __name__ == "__main__":
 							router 	= model_router
 						)
 
-	# scaling_policy  = 	ExpertOnlyScaling(
-	# 						model 	= model_wrapper,
-	# 					)
-
 	# Define compaction rules
 	compaction_rules 	= [ SizeRules(0, 45) ]
 
 	compaction_policy 	= LastRemovalCompaction()
 
-	# Define checkpoint rules and policies
-	# checkpoint_rules = 	[ SaveOnStateChange() ]
 	checkpoint_rules = 	[]
 
 	checkpoint_policy = DirectoryCheckpoint(save_path = args.save_path)
@@ -177,7 +176,7 @@ if __name__ == "__main__":
 		train_dat   = train_dat
 		ingested_counts  = 0
 
-		for each_training_dat in tqdm(np.array_split(train_dat, 2)):
+		for each_training_dat in tqdm(np.array_split(train_dat, 20)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.reshape(labels_as_tensor, [len(labels_as_tensor), 1])

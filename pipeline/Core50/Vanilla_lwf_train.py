@@ -14,7 +14,7 @@ from tqdm import tqdm
 """
 python3 pipeline/Core50/Vanilla_lwf_train.py \
 --train_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/train \
---save_path checkpoint/core50/vgg/vanilla_lwf/alpha_0.7
+--save_path checkpoint/core50/vgg/vanilla_lwf/alpha_0.6
 """
 
 def build_net():
