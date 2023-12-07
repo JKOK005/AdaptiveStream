@@ -99,7 +99,7 @@ if __name__ == "__main__":
 		logging.info(f"Reading: {each_file}")
 		train_dat 	= np.load(each_file, allow_pickle = True) # load
 
-		for each_training_dat in tqdm(np.array_split(train_dat, 3)):
+		for each_training_dat in tqdm(np.array_split(train_dat, 1)):
 			feats_as_tensor   = tf.convert_to_tensor(each_training_dat[:,0].tolist(), dtype = tf.float32)
 			labels_as_tensor  = tf.convert_to_tensor(each_training_dat[:,1].tolist(), dtype = tf.float32)
 
