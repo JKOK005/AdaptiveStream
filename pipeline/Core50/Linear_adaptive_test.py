@@ -9,7 +9,7 @@ from pathlib import Path
 from adaptivestream.Models import ExpertEnsemble, Expert
 from adaptivestream.Models.Router import OutlierAERouter
 from adaptivestream.Models.Wrapper import SupervisedModelWrapper
-from adaptivestream.Models.Net import VggNet16Factory
+from adaptivestream.Models.Net import VggNet16Factory, CaffeNetFactory
 from adaptivestream.Rules.Scaling import OnlineMMDDrift
 from adaptivestream.Policies.Scaling import NaiveScaling
 from adaptivestream.Policies.Compaction import NoCompaction
@@ -24,7 +24,12 @@ python3 pipeline/Core50/Linear_adaptive_test.py \
 """
 
 def build_vgg_net():
+	logging.info(f"Using VGGNet")
 	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
+
+def build_caffe_net():
+	logging.info(f"Using CaffeNet")
+	return CaffeNetFactory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
 def load_model(path: str, net: str):
 	dummy_expert_ensemble = ExpertEnsemble(
@@ -40,6 +45,9 @@ def load_model(path: str, net: str):
 
 		if net == "vgg":
 			base_model = build_vgg_net()
+
+		elif net == "caffe":
+			base_model = build_caffe_net()
 
 		weight_path = os.path.join(path, f"{name}_model.h5")
 		router_path = os.path.join(path, f"{name}_router.pkl")

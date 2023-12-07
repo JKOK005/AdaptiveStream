@@ -5,7 +5,7 @@ import os
 import tensorflow as tf
 import time
 import pickle
-from adaptivestream.Models.Net import VggNet16Factory
+from adaptivestream.Models.Net import VggNet16Factory, CaffeNetFactory
 from Examples.Math.index_tree_creation import *
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, Input, Flatten, Conv2D, Conv2DTranspose, Reshape
@@ -19,11 +19,19 @@ python3 pipeline/Core50/Vanilla_test.py \
 """
 
 def build_vgg_net():
+	logging.info(f"Using VGGNet")
 	return VggNet16Factory.get_model(input_shape = (128, 128, 3,), output_size = 10)
+
+def build_caffe_net():
+	logging.info(f"Using CaffeNet")
+	return CaffeNetFactory.get_model(input_shape = (128, 128, 3,), output_size = 10)
 
 def load_model(path: str, net: str):
 	if net == "vgg":
-		base_model = build_vgg_net()
+		base_model 		= build_vgg_net()
+
+	elif net == "caffe":
+			base_model 	= build_caffe_net()
 
 	base_model.load_weights(path)
 	return base_model
