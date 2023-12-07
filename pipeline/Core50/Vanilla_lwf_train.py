@@ -15,7 +15,7 @@ from tqdm import tqdm
 python3 pipeline/Core50/Vanilla_lwf_train.py \
 --net caffe \
 --train_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/train \
---save_path checkpoint/core50/caffenet/vanilla_lwf/alpha_0.9
+--save_path checkpoint/core50/caffenet/vanilla_lwf/alpha_0.5
 """
 
 def build_vgg_net():
@@ -78,7 +78,7 @@ if __name__ == "__main__":
 						learning_rate = 0.00005,
 					)
 
-	loss_fn 	= LwfLoss(tmp = 1.1, lwf_alpha = 0.9)
+	loss_fn 	= LwfLoss(tmp = 1.1, lwf_alpha = 0.5)
 
 	model 		= build_vgg_net() if args.net == "vgg" else build_caffe_net()
 
