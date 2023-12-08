@@ -151,9 +151,6 @@ class ExpertEnsemble(object):
 		loss_sm  	= tf.math.softmax(tf.math.log(loss))
 		loss_sm 	= tf.cast(loss_sm, tf.float32)
 
-		print(probs)
-		print(loss_sm)
-
 		agg_score  	= alpha * (1 - probs) + (1 - alpha) * loss_sm
 		best_indx   = int(tf.argmin(agg_score))
 		print(f"Best expert index: {best_indx}, experts: {len(all_experts)}")
