@@ -1,26 +1,41 @@
 import tensorflow as tf
-from alibi_detect.od import OutlierVAE
+from alibi_detect.od import OutlierAE
 from Buffer.Buffer import Buffer
 from statistics import NormalDist
 from Models.Router.Router import Router
 
-class OutlierVAERouter(Router):
+class OutlierAERouter(Router):
 	def __init__(self, 	init_params: dict,
 						training_params: dict,
 						inference_params: dict,
 						*args, **kwargs
 				):
 		"""
-		Parameters follow suite alibi_detect.od.OutlierVAE class in alibi_detect
+		Parameters follow suite alibi_detect.od.OutlierAE class in alibi_detect
 		Please use alibi_detect Tensorflow backend
 
-		Ref: https://docs.seldon.io/projects/alibi-detect/en/stable/od/methods/vae.html
+		Ref: https://docs.seldon.io/projects/alibi-detect/en/latest/od/methods/ae.html#Overview
 		"""
-		self.classifier 		= OutlierVAE(**init_params)
+		self.classifier 		= OutlierAE(**init_params)
 		self.prob_dist  		= None
+		self.init_params 		= init_params
 		self.training_params 	= training_params
 		self.inference_params 	= inference_params
 		return
+
+	def __deepcopy__(self, memo):
+		cls = self.__class__
+		result = cls.__new__(cls)
+		memo[id(self)] = result
+
+		setattr(result, "classifier", OutlierAE(**self.init_params))
+		setattr(result, "prob_dist", None)
+		setattr(result, "init_params", self.init_params)
+		setattr(result, "training_params", self.training_params)
+		setattr(result, "inference_params", self.inference_params)
+
+		# Return updated instance
+		return result
 
 	def train(self, buffer: Buffer,
 					*args, **kwargs

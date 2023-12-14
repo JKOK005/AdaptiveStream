@@ -1,3 +1,4 @@
 from Models.Router.IsolationForestRouter import IsolationForestRouter
 from Models.Router.OneClassSVMRouter import OneClassSVMRouter
 from Models.Router.OutlierVAERouter import OutlierVAERouter
+from Models.Router.OutlierAERouter import OutlierAERouter
