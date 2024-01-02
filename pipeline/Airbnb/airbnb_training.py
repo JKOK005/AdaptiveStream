@@ -4,7 +4,7 @@ import glob
 import pandas as pd
 import tensorflow as tf
 from adaptivestream.Buffer import LabelledFeatureBuffer
-from adaptivestream.Models import ExpertEnsemble
+from adaptivestream.Models import ExpertEnsemble, IndexedExpertEnsemble, IndexTreeBuilder
 from adaptivestream.Models.Router import IsolationForestRouter, OutlierVAERouter, OneClassSVMRouter
 from adaptivestream.Models.Wrapper import XGBoostModelWrapper
 from adaptivestream.Policies.Compaction import NoCompaction
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 						]
 						
 	model_wrapper 	= 	XGBoostModelWrapper(
-							xg_boost_model 	= build_net_randomforest(),
+							xg_boost_model 	= build_net(),
 							training_params = {},
 							loss_fn 		= tf.keras.losses.MeanSquaredError(reduction = tf.keras.losses.Reduction.SUM),
 						)
@@ -85,7 +85,25 @@ if __name__ == "__main__":
 							router 	= model_router
 						)
 
-	expert_ensemble = ExpertEnsemble(
+	# expert_ensemble = ExpertEnsemble(
+	# 					buffer 				= LabelledFeatureBuffer(),
+	# 					scaling_rules 		= scaling_rules,
+	# 					scaling_policy 		= scaling_policy, 
+	# 					compaction_rules 	= [],
+	# 					compaction_policy 	= NoCompaction(),
+	# 					checkpoint_rules 	= checkpoint_rules,
+	# 					checkpoint_policy 	= checkpoint_policy
+	# 				)
+
+	tree_builder 	= IndexTreeBuilder(
+						leaf_expert_count = 3, 
+						k_clusters = 4,
+						exemplar_count = 1,
+					)
+
+	expert_ensemble = IndexedExpertEnsemble(
+						tree_builder 		= tree_builder,
+						index_dim 			= 3,
 						buffer 				= LabelledFeatureBuffer(),
 						scaling_rules 		= scaling_rules,
 						scaling_policy 		= scaling_policy, 
@@ -93,7 +111,7 @@ if __name__ == "__main__":
 						compaction_policy 	= NoCompaction(),
 						checkpoint_rules 	= checkpoint_rules,
 						checkpoint_policy 	= checkpoint_policy
-					)
+					)	
 
 	for file in glob.glob(f"{args.train_dir}/*.csv"):
 		train_df = pd.read_csv(file)

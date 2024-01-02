@@ -4,6 +4,7 @@ import logging
 import pandas as pd
 import pickle
 import tensorflow as tf
+import time
 
 """
 python3 pipeline/Airbnb/airbnb_canada_test.py \
@@ -38,20 +39,24 @@ if __name__ == "__main__":
 	batch_loss 			= 0
 	batch_count 		= 0
 
+	total_time = 0
 	for batch_feats, batch_labels in data_gen_testing.batch(16):
-		# row_count = batch_feats.shape[0]
-		# percentile_smpls = int(row_count * 0.3)
+		row_count = batch_feats.shape[0]
+		percentile_smpls = int(row_count * 0.3)
 		
-		# feats_smpl 	= batch_feats[:percentile_smpls, :]
-		# labels_smpl = batch_labels[:percentile_smpls]
+		feats_smpl 	= batch_feats[:percentile_smpls, :]
+		labels_smpl = batch_labels[:percentile_smpls]
 
-		# pred = expert_ensemble.infer_w_smpls(input_data = batch_feats, 
-		# 									 truth_smpls = (feats_smpl, labels_smpl), 
-		# 									 alpha = args.alpha)
+		cur_time = time.time()
+		pred = expert_ensemble.infer_w_smpls(input_data = batch_feats, 
+											 truth_smpls = (feats_smpl, labels_smpl), 
+											 alpha = args.alpha)
+		total_time 	+= time.time() - cur_time
 
-		pred 		= expert_ensemble.infer(input_data = batch_feats)
+		# pred 		= expert_ensemble.infer(input_data = batch_feats)
 		batch_loss 	+= loss_fn(batch_labels, pred)
 		batch_count += 1
 		
 		logging.info(f"Batch count: {batch_count}, Average batch loss: {batch_loss / batch_count}")
 	logging.info(f"Test count: {len(test_df)}")
+	logging.info(f"Time: {total_time}")
