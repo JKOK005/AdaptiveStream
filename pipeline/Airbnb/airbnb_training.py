@@ -68,7 +68,7 @@ if __name__ == "__main__":
 						]
 						
 	model_wrapper 	= 	XGBoostModelWrapper(
-							xg_boost_model 	= build_net_randomforest(),
+							xg_boost_model 	= build_net(),
 							training_params = {},
 							loss_fn 		= tf.keras.losses.MeanSquaredError(reduction = tf.keras.losses.Reduction.SUM),
 						)
@@ -97,8 +97,8 @@ if __name__ == "__main__":
 
 	tree_builder 	= IndexTreeBuilder(
 						leaf_expert_count = 3, 
-						k_clusters = 2,
-						exemplar_count = 3,
+						k_clusters = 4,
+						exemplar_count = 1,
 					)
 
 	expert_ensemble = IndexedExpertEnsemble(
