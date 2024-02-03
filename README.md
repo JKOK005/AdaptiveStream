@@ -24,23 +24,14 @@ Current implentation supports the following buffer(s):
 More buffer classes may be implemented in the future.
 
 ### Scaling rules
-`AdaptiveStream` uses Alibi-detect for concept drift detection. Other non-drift based rules may also be found in the `Rules.Scaling`.
+`AdaptiveStream` uses Alibi-detect for concept drift detection. Other non-drift based rules are also offered.
 
-Current implementation supports the following kinds of scaling rules(s):
-
-| Rule | Description |
-| ------ | ------ |
-| BufferSizeLimit | Scaling when the buffer size hits a hard threshold. |
-| MaxDuration | Scales when data has been accummulated beyond a time period in the buffer since last clearance. |
-| TimeLimit | (For timestamped data) Scales when the data has exceeded a time period, as defined by the `batch_timestamp` property during ingestion | 
-| OnlineMMDDrift | Online MMD Drift [detector](https://docs.seldon.io/projects/alibi-detect/en/latest/cd/methods/onlinemmddrift.html) | 
-
-More rule classes may be implemented in the future.
+Please see [scaling rules](adaptivestream/Rules/Scaling) for more details.
 
 ### Compaction rules
 Compaction helps limit the memory demads for capacity scaled MoE applications. This is especially important for long running applications where expert size may grow indefinitely.
 
-Please see [compaction rules](Rules/Compaction) for more details.
+Please see [compaction rules](adaptivestream/Rules/Compaction) for more details.
 
 ### MoE Ensemble
 An ensemble consists of a collection of expert models. Each model is tuned on a specific snapshot of the data. We have 
