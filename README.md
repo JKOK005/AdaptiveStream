@@ -25,6 +25,16 @@ Current implentation supports the following buffer(s):
 
 More buffer classes may be implemented in the future.
 
+### MoE Ensemble
+An ensemble consists of a collection of expert models. Each model is tuned on a specific snapshot of the data.
+
+At present, `AdaptiveStream` supports 2 kinds of expert configuration.
+
+| Ensemble configuration | Description |
+| ------ | ------ |
+| ExpertEnsemble | Experts are organized linearly. |
+| IndexedExpertEnsemble | Experts are organized in an indexed tree. |
+
 ### Scaling rules
 `AdaptiveStream` uses Alibi-detect for concept drift detection. Other non-drift based rules are also offered.
 
@@ -45,5 +55,3 @@ Compacting merges the last expert with the fallback expert. This shrinks the ens
 
 Please see [compaction policies](adaptivestream/Policies/Compaction) for more details.
 
-### MoE Ensemble
-An ensemble consists of a collection of expert models. Each model is tuned on a specific snapshot of the data. We have 
