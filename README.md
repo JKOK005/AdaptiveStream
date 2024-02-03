@@ -1,8 +1,6 @@
 # AdaptiveStream
 `AdaptiveStream` is a framework harnessing capacity scaled Mixture of Expert models (MoE) for continual learning (CL) applications.
 
-We offer end-to-end development of CL pipelines, deployable in $\approx$ 20 lines of code. 
-
 This repository guides the user on how to set up an `AdaptiveStream` pipeline and train our MoE ensemble on both the Airbnb & CORe50 dataset.
 
 ## Architecture
@@ -11,6 +9,10 @@ This repository guides the user on how to set up an `AdaptiveStream` pipeline an
 Continual learning models are constantly adapting towards distribution drifts within the data. 
 
 Drift in real world data are a combination of sporadic and seasonal factors. Constant adjustments of a model's weights may induce the model to forget prior learnings which may be important for predicting seasonal patterns. 
+
+`AdaptiveStream` offer end-to-end development of CL pipelines, deployable in $\approx$ 20 lines of code. 
+
+The framework is primarily built on Tensorflow 2.11 and supported by multiple open sourced packages. 
 
 ### Buffers
 In `AdaptiveStream`, incoming data is stored in an in-memory buffer. This buffer may be cleared after each scaling event. 
@@ -27,6 +29,11 @@ More buffer classes may be implemented in the future.
 `AdaptiveStream` uses Alibi-detect for concept drift detection. Other non-drift based rules are also offered.
 
 Please see [scaling rules](adaptivestream/Rules/Scaling) for more details.
+
+### Scaling policies
+Unless a retention window is defined, all scaling events will clear the buffer. 
+
+Please see [scaling policies](adaptivestream/Policies/Scaling) for more details.
 
 ### Compaction rules
 Compaction helps limit the memory demads for capacity scaled MoE applications. This is especially important for long running applications where expert size may grow indefinitely.
