@@ -55,3 +55,23 @@ Compacting merges the last expert with the fallback expert. This shrinks the ens
 
 Please see [compaction policies](adaptivestream/Policies/Compaction) for more details.
 
+## Dataset
+`AdaptiveStream` was benchmarked against the Airbnb / CORe50 / Grab-ETA dataset, of which the first 2 will be made available.
+
+### Examples
+To start model training for the Airbnb dataset, run the command
+
+`python
+python3 pipeline/Airbnb/airbnb_canada_training.py \
+--train_dir <directory to airbnb .csv files> \
+--save_path <save model paths> 
+`
+
+To start model training for the CORe50 dataset, run the command
+
+`python
+python3 pipeline/Core50/Linear_adaptive.py \
+--net <vgg or caffe> \
+--train_dir <directory to NI or NC dataset> \
+--save_path <save model path>
+`
