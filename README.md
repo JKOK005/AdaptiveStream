@@ -6,5 +6,4 @@ We offer end-to-end development of CL pipelines, deployable in $\approx$ 20 line
 This repository guides the user on how to set up an AdaptiveStream pipeline and train our MoE ensemble on both the Airbnb & CORe50 dataset.
 
 ## Architecture
-![process_flow](img/process_flow_adaptivestream.png =128x128)
-
+<img src="img/process_flow_adaptivestream.png" width="128" height="128"></img>
