@@ -27,7 +27,6 @@ from tqdm import tqdm
 python3 pipeline/Core50/Linear_adaptive.py \
 --net caffe \
 --train_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/train \
---test_dir /workspace/jupyter_notebooks/adaptive-stream/data/Core50/save/NI/test \
 --save_path checkpoint/core50/caffenet/linear
 """
 
@@ -99,7 +98,6 @@ if __name__ == "__main__":
 	parser 		= argparse.ArgumentParser(description='Linear AdaptiveStream training on Core50')
 	parser.add_argument('--net', type = str, nargs = '?', help = 'Type of network')
 	parser.add_argument('--train_dir', type = str, nargs = '?', help = 'Path to train features')
-	parser.add_argument('--test_dir', type = str, nargs = '?', help = 'Path to train features')
 	parser.add_argument('--save_path', type = str, nargs = '?', help = 'Model checkpoint path')
 	args 		= parser.parse_args()
 
