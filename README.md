@@ -40,5 +40,10 @@ Compaction helps limit the memory demads for capacity scaled MoE applications. T
 
 Please see [compaction rules](adaptivestream/Rules/Compaction) for more details.
 
+### Compaction policies
+Compacting merges the last expert with the fallback expert. This shrinks the ensemble size by 1. 
+
+Please see [compaction policies](adaptivestream/Policies/Compaction) for more details.
+
 ### MoE Ensemble
 An ensemble consists of a collection of expert models. Each model is tuned on a specific snapshot of the data. We have 
