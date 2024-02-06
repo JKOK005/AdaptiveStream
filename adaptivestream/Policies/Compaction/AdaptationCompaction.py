@@ -10,7 +10,6 @@ class AdaptationCompaction(CompactionPolicy):
 
     def compact(self, experts, 
 					  fallback_expert,
-                      buffer,
 					  *args, **kwargs
 				):
         new_experts = experts[-self.N:]
@@ -20,14 +19,14 @@ class AdaptationCompaction(CompactionPolicy):
         if self.strategy == 'minloss':
             loss = []
             for model in K_old_experts:
-                loss_value = model.loss(buffer.get_data(), buffer.get_label())
+                loss_value = model.loss(self.buffer.get_data(), self.buffer.get_label())
                 loss.append(loss_value)
             idx = np.argmin(loss)
             new_fallback_expert = K_old_experts[idx]
         elif self.strategy == 'performance':
             evaluate = []
             for model in K_old_experts:
-                performance = model.evaluate(buffer.get_data(), buffer.get_label())
+                performance = model.evaluate(self.buffer.get_data(), self.buffer.get_label())
                 evaluate.append(perform)
             idx = np.argmax(evaluate)
             new_fallback_expert = K_old_experts[idx]

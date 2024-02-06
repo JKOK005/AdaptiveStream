@@ -22,7 +22,6 @@ class MetaCompaction(CompactionPolicy):
 
     def compact(self, experts, 
 					  fallback_expert,
-                      buffer,
 					  *args, **kwargs
 				):
         new_experts = experts[-self.N:]
@@ -31,7 +30,7 @@ class MetaCompaction(CompactionPolicy):
 
         performance = []
         for model in K_old_experts:
-            result = model.loss(buffer.get_data(), buffer.get_label())
+            result = model.loss(self.buffer.get_data(), self.buffer.get_label())
             performance.append(result * -1)
         
         weight = tf.expand_dims(self.softmax(performance), axis=-1)

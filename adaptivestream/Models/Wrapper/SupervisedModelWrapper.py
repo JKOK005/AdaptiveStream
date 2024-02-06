@@ -35,7 +35,6 @@ class SupervisedModelWrapper(ModelWrapper):
 		self.GPU_NUM 				= 0
 		return
 
-	@load_balance_gpu
 	def __deepcopy__(self, memo, *args, **kwargs):
 		cls = self.__class__
 		result = cls.__new__(cls)
@@ -49,9 +48,6 @@ class SupervisedModelWrapper(ModelWrapper):
 			elif k == "optimizer" or k == "loss_fn":
 				setattr(result, k, v)
 
-			elif k == "GPU_NUM":
-				setattr(result, k, kwargs["GPU_NUM"])
-
 			else:
 				setattr(result, k, copy.deepcopy(v, memo))
 
@@ -64,14 +60,11 @@ class SupervisedModelWrapper(ModelWrapper):
 		buffer_feat 	= buffer.get_data()
 		buffer_label 	= buffer.get_label()
 
-		with tf.device(f"/device:GPU:{self.GPU_NUM}"):
-			print(f"Training on GPU: {self.GPU_NUM}")
+		dataset 	= tf.data.Dataset.from_tensor_slices((buffer_feat, buffer_label)) \
+									 .batch(self.training_batch_size)
 
-			dataset 		= tf.data.Dataset.from_tensor_slices((buffer_feat, buffer_label)) \
-											 .batch(self.training_batch_size)
-
-			self.model.compile(optimizer = self.optimizer, loss = self.loss_fn)
-			self.model.fit(x = dataset, **self.training_params)
+		self.model.compile(optimizer = self.optimizer, loss = self.loss_fn)
+		self.model.fit(x = dataset, **self.training_params)
 		return
 
 	def infer(	self, input_X: tf.Tensor, 
